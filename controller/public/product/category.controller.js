@@ -11,7 +11,13 @@ const getCategoryById = asyncHandler(async (req, res) => {
     if (!_id) {
         return res.error("Category Id Are Required", 400);
     }
-    const category = await Category.findById(_id).populate("products").exec();
+    const category = await Category.findById(_id).populate({
+        path: "products",
+        populate: {
+            path: "fabric",
+        },
+    });
+
     if (!category) {
         return res.error("category Not Found", 404);
     }

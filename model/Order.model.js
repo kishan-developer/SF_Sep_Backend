@@ -6,6 +6,9 @@ const orderSchema = new mongoose.Schema(
             type: String,
             required: true,
         },
+        delhiveryReceipt: {
+            type: String,
+        },
         user: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
@@ -31,6 +34,14 @@ const orderSchema = new mongoose.Schema(
         shippingAddress: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "Address",
+        },
+        shippingAddressSnapshot: {
+            street: String,
+            city: String,
+            state: String,
+            zip: String,
+            country: String,
+            phone: String,
         },
         paymentMethod: {
             type: String,

@@ -119,8 +119,7 @@ exports.registerUser = asyncHandler(async (req, res) => {
 // User Login Handler
 
 exports.login = asyncHandler(async (req, res) => {
-
-    console.log("req.body", req.body)
+    console.log("req.body", req.body);
 
     const { password } = req.body;
     const email = req.body?.email.trim().toLowerCase();
@@ -168,25 +167,26 @@ exports.login = asyncHandler(async (req, res) => {
     delete userData.password; // Don't expose hashed password
     delete userData.__v;
     delete userData.refreshToken;
-//     const options = {
-//         httpOnly: true,
-//      secure: false,        // ✅ for localhost
-//   sameSite: "Lax",      // ✅ for localhost
-//     };
-   
-const isProduction = process.env.NODE_ENV === "production";
+    // const options = {
+    //     httpOnly: true,
+    //     secure: false, // ✅ for localhost
+    //     sameSite: "Lax", // ✅ for localhost
+    // };
 
-res.cookie("refreshToken", refreshToken, {
-  httpOnly: true,
-  secure: isProduction, // true on production, false on localhost
-  sameSite: isProduction ? "None" : "Lax", // "None" needed for cross-origin
-});
-res.cookie("token", token, {
-  httpOnly: true,
-  secure: isProduction,
-  sameSite: isProduction ? "None" : "Lax",
-});
+    const isProduction = process.env.NODE_ENV === "production";
 
+    res.cookie("refreshToken", refreshToken, {
+        httpOnly: true,
+        secure: false, // true on production, false on localhost
+        sameSite: "Lax", // "None" needed for cross-origin
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+    res.cookie("token", token, {
+        httpOnly: true,
+        secure: false, // true on production, false on localhost
+        sameSite: "Lax", // "None" needed for cross-origin
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
 
     return res.success(`Welcome ${user.firstName}`, {
         user: userData,
@@ -378,32 +378,33 @@ exports.forgotPassword = asyncHandler(async (req, res) => {
 //     }
 // };
 exports.logoutUser = async (req, res) => {
-  try {
-    const refreshToken = req.cookies?.refreshToken;
+    try {
+        const refreshToken = req.cookies?.refreshToken;
 
-    if (refreshToken) {
-      const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_TOKEN_SECRET);
-      await User.findByIdAndUpdate(decoded._id, {
-        $unset: { refreshToken: 1 },
-      });
+        if (refreshToken) {
+            const decoded = jwt.verify(
+                refreshToken,
+                process.env.JWT_REFRESH_TOKEN_SECRET
+            );
+            await User.findByIdAndUpdate(decoded._id, {
+                $unset: { refreshToken: 1 },
+            });
+        }
+
+        res.clearCookie("token", { httpOnly: true, secure: false });
+        res.clearCookie("refreshToken", { httpOnly: true, secure: false });
+
+        return res.success("User logged out");
+    } catch (error) {
+        console.log("Logout error:", error.message);
+        return res.success("Logged out"); // still success, even if error
     }
-
-    res.clearCookie("token", { httpOnly: true, secure: false });
-    res.clearCookie("refreshToken", { httpOnly: true, secure: false });
-
-    return res.success("User logged out");
-  } catch (error) {
-    console.log("Logout error:", error.message);
-    return res.success("Logged out"); // still success, even if error
-  }
 };
 
-
 exports.regenerateToken = asyncHandler(async (req, res) => {
-    const incomingRefreshToken =
-       req?.cookies?.refreshToken
-    console.log('Refresh token ->', incomingRefreshToken)
-    console.log('Refresh token API Cookies->', req.cookies);
+    const incomingRefreshToken = req?.cookies?.refreshToken;
+    console.log("Refresh token ->", incomingRefreshToken);
+    console.log("Refresh token API Cookies->", req.cookies);
     if (!incomingRefreshToken) {
         return res.error("Unauthorized request", 400);
     }

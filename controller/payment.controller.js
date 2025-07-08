@@ -3,6 +3,7 @@ const razorpayInstance = require("../utils/razorpayInstance");
 const Payment = require("./../model/Payment.model");
 const crypto = require("crypto");
 const Order = require("../model/Order.model");
+const Address = require("../model/Adress.model");
 const TempOrder = require("../model/TempOrder.model");
 const User = require("../model/User.model");
 exports.checkoutHandler = async (req, res) => {
@@ -88,12 +89,22 @@ exports.paymentVerificationHandler = async (req, res) => {
         const paymentDetails = await razorpayInstance.payments.fetch(
             razorpay_payment_id
         );
+        const address = await Address.findById(tempOrder.shippingAddress);
         const paymentMethod = paymentDetails.method; // e.g. "upi", "card", "wallet"
+
         const finalOrder = await Order.create({
             ...tempData,
             paymentMethod,
             paymentStatus: "Paid",
             paidAt: new Date(),
+            shippingAddressSnapshot: {
+                street: address.street,
+                city: address.city,
+                state: address.state,
+                postalCode: address.postalCode,
+                country: address.country,
+                phone: address.phone,
+            },
         });
 
         // 3. Create payment record

@@ -64,8 +64,24 @@ const getOrderById = async (req, res) => {
     }
 };
 
+const updateDelhiveryReceipt = async (req, res) => {
+    const { delhiveryReceipt, orderId } = req.body;
+    if (!delhiveryReceipt) {
+        return res.error("Please provide image", 404);
+    }
+    const order = await Order.findById(orderId);
+    if (!order) {
+        return res.error("Order dose not exit");
+    }
+
+    order.delhiveryReceipt = delhiveryReceipt;
+    order.save();
+    return res.success("Delhivery Receipt Uploaded Successfully");
+};
+
 module.exports = {
     getOrders,
     updateOrderStatus,
     getOrderById,
+    updateDelhiveryReceipt,
 };

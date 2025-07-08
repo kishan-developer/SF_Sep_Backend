@@ -36,7 +36,8 @@ const productSchema = new mongoose.Schema(
         },
 
         fabric: {
-            type: String,
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Fabric",
             required: true,
         },
         technique: {

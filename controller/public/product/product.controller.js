@@ -4,6 +4,7 @@ const asyncHandler = require("express-async-handler");
 const getAllProducts = asyncHandler(async (req, res) => {
     const products = await Product.find({})
         .populate("category")
+        .populate("fabric")
         .populate({
             path: "reviews",
             populate: {
@@ -21,6 +22,7 @@ const getProductById = asyncHandler(async (req, res) => {
     }
     const product = await Product.findById(_id)
         .populate("category")
+        .populate("fabric")
         .populate({
             path: "reviews",
             populate: {
@@ -33,4 +35,32 @@ const getProductById = asyncHandler(async (req, res) => {
     }
     return res.success("Product Fetched Successfully", product);
 });
-module.exports = { getAllProducts, getProductById };
+
+const getProductByfabric = async (req, res) => {
+    try {
+        console.log(req.params);
+        const { fabric, id } = req.params;
+        const title = fabric;
+        if (!title) {
+            return res
+                .status(400)
+                .json({ success: false, message: "Fabric title is required" });
+        }
+
+        const products = await Product.find().populate("fabric").lean();
+
+        const filteredProducts = products.filter(
+            (product) =>
+                product.fabric?.title?.toLowerCase() === title.toLowerCase()
+        );
+
+        res.json({
+            success: true,
+            data: filteredProducts,
+        });
+    } catch (err) {
+        console.error("Error:", err);
+        res.status(500).json({ success: false, message: "Server Error" });
+    }
+};
+module.exports = { getAllProducts, getProductById, getProductByfabric };

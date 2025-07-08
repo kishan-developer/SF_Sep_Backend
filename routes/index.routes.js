@@ -4,6 +4,7 @@ const adminRoutes = require("../routes/admin/index.routes");
 const {
     getAllProducts,
     getProductById,
+    getProductByfabric,
 } = require("../controller/public/product/product.controller");
 const {
     getAllCategories,
@@ -28,6 +29,7 @@ router.use("/payment", paymentRoutes);
 // Products
 router.get("/products", getAllProducts);
 router.get("/products/:id", getProductById);
+router.get("/products/:fabric/:id", getProductByfabric);
 // Categories
 router.get("/categories", getAllCategories);
 router.get("/categories/:id", getCategoryById);
@@ -53,7 +55,7 @@ router.get("/categories/:id", getCategoryById);
 
 router.post("/upload", async (req, res) => {
     const files = req.files?.files;
-
+    console.log("File Of Image ->", files);
     if (!files) {
         return res.error("Please upload file(s) first", 400);
     }
