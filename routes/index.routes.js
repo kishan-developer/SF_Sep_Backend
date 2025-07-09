@@ -18,6 +18,7 @@ const bookVideoCallTemplate = require("../email/template/bookVideoCallTemplate")
 const bookVideoCallAdminTemplate = require("../email/template/bookVideoCallAdminTemplate");
 const Newsletter = require("../model/Newsletter.model");
 const contactEmailTemplate = require("../email/template/contactEmailTemplate");
+const { getOffer } = require("../controller/public/product/offer.controller");
 
 const router = express.Router();
 
@@ -33,25 +34,7 @@ router.get("/products/:fabric/:id", getProductByfabric);
 // Categories
 router.get("/categories", getAllCategories);
 router.get("/categories/:id", getCategoryById);
-
-// Upload ->
-// router.post("/upload", async (req, res) => {
-
-//     console.log("req.files", req.files)
-//     const images = req.files?.files ?? null;
-//     if (!images) {
-//         return res.error("Please Upload File First", 400);
-//     }
-//     if (Array.isArray(images)) {
-//         for (const image of images) {
-//             if (image.size > 20 * 1024 * 1024) {
-//                 return res.error("Image should not be larger than 20MB", 400);
-//             }
-//         }
-//     }
-//     const result = await imageUploader(images);
-//     return res.success("Images Uploaded Successfully", result);
-// });
+router.get("/offer", getOffer);
 
 router.post("/upload", async (req, res) => {
     const files = req.files?.files;

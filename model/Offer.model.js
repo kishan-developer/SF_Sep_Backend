@@ -1,13 +1,6 @@
 const mongoose = require("mongoose");
 
-const couponSchema = new mongoose.Schema({
-    code: {
-        type: String,
-        required: true,
-        unique: true,
-        trim: true,
-        lowercase: true,
-    },
+const offerSchema = new mongoose.Schema({
     discount: {
         type: Number,
         required: true,
@@ -39,16 +32,16 @@ const couponSchema = new mongoose.Schema({
 });
 
 // Add a virtual field to check if the coupon is expired
-couponSchema.virtual("isExpired").get(function () {
+offerSchema.virtual("isExpired").get(function () {
     const now = new Date();
     const ageLimit = this.maxAge * 60 * 60 * 1000; // convert hours to ms
     return now - this.createdAt > ageLimit;
 });
 
 // Optional: include virtuals when converting to JSON
-couponSchema.set("toJSON", { virtuals: true });
-couponSchema.set("toObject", { virtuals: true });
+offerSchema.set("toJSON", { virtuals: true });
+offerSchema.set("toObject", { virtuals: true });
 
-const Coupon = mongoose.model("Coupon", couponSchema);
+const Offer = mongoose.model("Offer", offerSchema);
 
-module.exports = Coupon;
+module.exports = Offer;

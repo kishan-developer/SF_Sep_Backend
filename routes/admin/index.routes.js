@@ -11,6 +11,8 @@ const userRouter = require("./user.routes");
 const { getOverview } = require("../../controller/admin/overview.controller");
 const orderRouter = require("./order.routes");
 const fabricRouter = require("./fabric.routes");
+const couponRouter = require("./coupon.routes");
+const adminOfferRouter = require("./offer.routes");
 
 // Not Want  ot inlcude Fabric ->
 adminRouter.use("/fabrics", fabricRouter);
@@ -20,6 +22,7 @@ adminRouter.use("/product", productRoutes);
 adminRouter.use("/category", categoryRoutes);
 adminRouter.use("/user", userRouter);
 adminRouter.use("/orders", orderRouter);
+adminRouter.use("/coupan", couponRouter);
+adminRouter.use("/offer", adminOfferRouter);
 adminRouter.get("/overview", getOverview);
-
 module.exports = adminRouter;
