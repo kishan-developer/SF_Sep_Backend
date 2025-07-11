@@ -5,7 +5,7 @@ async function getOrdersByUser(req, res) {
     try {
         const orders = await Order.find({ user: userId })
             .sort({ createdAt: -1 })
-            .populate("items.product", "name price images")
+            .populate("items.product")
             .populate("shippingAddress");
         console.log(orders);
         res.status(200).json(orders);

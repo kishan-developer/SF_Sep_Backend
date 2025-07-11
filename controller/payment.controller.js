@@ -8,7 +8,14 @@ const TempOrder = require("../model/TempOrder.model");
 const User = require("../model/User.model");
 exports.checkoutHandler = async (req, res) => {
     try {
-        const { amount, userId, items, addressId } = req.body;
+        const {
+            amount,
+            userId,
+            items,
+            addressId,
+            discount = 0,
+            offer = 0,
+        } = req.body;
 
         if (!amount || !userId || !items || !addressId) {
             return res.status(400).json({
@@ -40,6 +47,8 @@ exports.checkoutHandler = async (req, res) => {
             items: orderItems,
             shippingAddress: addressId,
             totalAmount: amount,
+            discount,
+            offer,
         });
         return res.status(200).json(razorpayOrder);
     } catch (error) {

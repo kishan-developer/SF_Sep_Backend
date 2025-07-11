@@ -35,6 +35,12 @@ const orderSchema = new mongoose.Schema(
             type: mongoose.Schema.Types.ObjectId,
             ref: "Address",
         },
+        discount: {
+            type: Number,
+        },
+        offer: {
+            type: Number,
+        },
         shippingAddressSnapshot: {
             street: String,
             city: String,

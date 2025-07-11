@@ -36,10 +36,14 @@ const updateOffer = async (req, res) => {
         const existingOffer = await Offer.findOne();
 
         if (!existingOffer) return res.error("No offer found to update.", 404);
-
+        const now = new Date();
         const updatedOffer = await Offer.findByIdAndUpdate(
             existingOffer._id,
-            updateData,
+            {
+                ...updateData,
+                createdAt: now,
+            },
+
             { new: true }
         );
 
@@ -50,7 +54,22 @@ const updateOffer = async (req, res) => {
     }
 };
 
+const adminGetOffer = async (req, res) => {
+    try {
+        const offer = await Offer.findOne();
+        console.log("Offer while fetching Offer ", offer);
+        if (!offer) {
+            return res.error("No active offer found.", 404);
+        }
+
+        return res.status(200).json(offer);
+    } catch (error) {
+        console.error("Error fetching offer:", error);
+        return res.error("Something went wrong while fetching the offer.", 500);
+    }
+};
 module.exports = {
     createOffer,
     updateOffer,
+    adminGetOffer,
 };

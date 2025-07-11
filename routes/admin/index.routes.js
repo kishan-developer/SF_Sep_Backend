@@ -22,7 +22,7 @@ adminRouter.use("/product", productRoutes);
 adminRouter.use("/category", categoryRoutes);
 adminRouter.use("/user", userRouter);
 adminRouter.use("/orders", orderRouter);
-adminRouter.use("/coupan", couponRouter);
+adminRouter.use("/coupon", couponRouter);
 adminRouter.use("/offer", adminOfferRouter);
 adminRouter.get("/overview", getOverview);
 module.exports = adminRouter;

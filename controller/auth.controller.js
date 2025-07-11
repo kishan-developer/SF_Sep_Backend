@@ -179,13 +179,13 @@ exports.login = asyncHandler(async (req, res) => {
         httpOnly: true,
         secure: false, // true on production, false on localhost
         sameSite: "Lax", // "None" needed for cross-origin
-        maxAge: 7 * 24 * 60 * 60 * 1000,
+        expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
     });
     res.cookie("token", token, {
         httpOnly: true,
         secure: false, // true on production, false on localhost
         sameSite: "Lax", // "None" needed for cross-origin
-        maxAge: 7 * 24 * 60 * 60 * 1000,
+        expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
     });
 
     return res.success(`Welcome ${user.firstName}`, {

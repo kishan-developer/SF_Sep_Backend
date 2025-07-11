@@ -32,6 +32,12 @@ const tempOrderSchema = new mongoose.Schema(
             type: mongoose.Schema.Types.ObjectId,
             ref: "Address",
         },
+        discount: {
+            type: Number,
+        },
+        offer: {
+            type: Number,
+        },
         paymentMethod: {
             type: String,
         },

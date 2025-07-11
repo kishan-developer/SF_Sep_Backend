@@ -39,9 +39,14 @@ const updateCoupon = async (req, res) => {
     const updateData = req.body;
 
     try {
-        const updated = await Coupon.findByIdAndUpdate(id, updateData, {
-            new: true,
-        });
+        const now = new Date();
+        const updated = await Coupon.findByIdAndUpdate(
+            id,
+            { ...updateData, createdAt: now },
+            {
+                new: true,
+            }
+        );
         if (!updated) return res.error("Coupon not found.", 404);
         return res.success("Coupon updated successfully.", updated);
     } catch (error) {
