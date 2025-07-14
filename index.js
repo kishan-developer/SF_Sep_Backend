@@ -26,6 +26,7 @@ app.use(compression());
 app.use(cookieParser());
 
 const allowedOrigins = [
+    "https://srijanfabs.in",
     "http://localhost:5173",
     "http://192.168.1.26:5555",
     "https://shreejan-fab-frontend.vercel.app",
