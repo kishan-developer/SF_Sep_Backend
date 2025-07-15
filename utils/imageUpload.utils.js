@@ -75,19 +75,6 @@ const manualUploader = async (type = "", identifier = "", files,  folderName = "
 
 
 // 3️ Streaming upload using multer-s3
-const streamUpload = multer({
-  storage: multerS3({
-    s3,
-    bucket: process.env.AWS_S3_BUCKET_NAME,
-    contentType: multerS3.AUTO_CONTENT_TYPE,
-    key: function (req, file, cb) {
-      const fileName = Date.now() + "-" + file.originalname;
-      cb(null, `uploads/${fileName}`);
-    },
-  }),
-});
-
-
 // const streamUpload = multer({
 //   storage: multerS3({
 //     s3,
@@ -98,8 +85,21 @@ const streamUpload = multer({
 //       cb(null, `uploads/${fileName}`);
 //     },
 //   }),
-//   limits: { fileSize: 20 * 1024 * 1024 }, // 20MB
 // });
+
+
+const streamUpload = multer({
+  storage: multerS3({
+    s3,
+    bucket: process.env.AWS_S3_BUCKET_NAME,
+    contentType: multerS3.AUTO_CONTENT_TYPE,
+    key: function (req, file, cb) {
+      const fileName = Date.now() + "-" + file.originalname;
+      cb(null, `uploads/${fileName}`);
+    },
+  }),
+  limits: { fileSize: 100 * 1024 * 1024 } // 100MB
+});
 
 
 module.exports = {
