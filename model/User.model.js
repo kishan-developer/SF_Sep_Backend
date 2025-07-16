@@ -139,7 +139,7 @@ userSchema.methods.generateToken = function () {
             _id: this._id,
         },
         process.env.JWT_SECRET,
-        { expiresIn: "15m" }
+        { expiresIn: "50m" }
     );
 };
 userSchema.methods.generateRefreshToken = function name() {
