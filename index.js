@@ -15,6 +15,7 @@ const {
 } = require("./middleware/globalErrorHandler.middleware");
 const connectCloudinary = require("./config/cloudinary");
 const imageUploader = require("./utils/imageUpload.utils");
+const uploadRoutes = require("./routes/admin/upload.routes")
 const router = require("./routes/index.routes");
 // Connect Database
 connectDB(); // connect Database
@@ -28,16 +29,17 @@ app.use(cookieParser());
 const allowedOrigins = [
     "https://srijanfabs.in",
     "http://localhost:5173",
-    "http://192.168.1.26:5555",
-    "https://shreejan-fab-frontend.vercel.app",
+    
 ];
 
 app.use(express.json());
+
 app.use(
     express.urlencoded({
         extended: true,
     })
 );
+
 app.use(
     cors({
         origin: function (origin, callback) {
@@ -50,10 +52,13 @@ app.use(
         credentials: true,
     })
 );
+
 // Limit repeated requests (rate limiting)
 // app.use(ratelimit);
+
 // Secure HTTP headers to protect your app
 app.use(helmet());
+
 // Sanitize input to prevent NoSQL injection attacks
 
 // Handle file uploads, with temporary storage for large files
@@ -70,15 +75,23 @@ app.use(sendCustomResponse);
 // Stating from this route localhost:8000/api/v1/auth/register
 app.use("/api/v1", router);
 
-//
+
 app.get("/", (req, res) => {
-    return res.success("Welcome! Test route is working");
+  res.send("Welcome to the API root");
 });
+
+// app.post("/files", uploadRoutes);
+
+// app.get("/api/hello", (req, res) => {
+//   res.json({ message: "Hello from API!" });
+// });
+
 
 app.use(notFound);
 app.use(globalErrorHandler);
-const PORT = process.env.PORT || 8080;
 
-app.listen(PORT, () => {
-    console.log(`Server running at http://localhost:${PORT}`);
+const PORT = process.env.PORT || 5679;
+
+app.listen(PORT, (err) => {
+  console.log(`Server running on http://localhost:${PORT}`);
 });
