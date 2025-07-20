@@ -3,6 +3,7 @@ const razorpayInstance = require("../utils/razorpayInstance");
 const Payment = require("./../model/Payment.model");
 const crypto = require("crypto");
 const Order = require("../model/Order.model");
+const Product = require("../model/Product.model");
 const Address = require("../model/Adress.model");
 const TempOrder = require("../model/TempOrder.model");
 const User = require("../model/User.model");
@@ -37,6 +38,7 @@ exports.checkoutHandler = async (req, res) => {
                 quantity: item?.quantity,
                 withFallPico: item.addons.withFallPico,
                 withTassels: item.addons.withTassels,
+                isOfferAplied: items.isOfferAplied,
             };
         });
         // 2. Save order in MongoDB
@@ -94,6 +96,11 @@ exports.paymentVerificationHandler = async (req, res) => {
         delete tempData._id;
         delete tempData.createdAt;
         delete tempData.updatedAt;
+        // Getting this data for decrease Stock Of Product
+        const orderedItems = tempData?.items?.map((item) => ({
+            _id: item.product,
+            quantity: item.quantity,
+        }));
 
         const paymentDetails = await razorpayInstance.payments.fetch(
             razorpay_payment_id
@@ -127,6 +134,16 @@ exports.paymentVerificationHandler = async (req, res) => {
 
         // 4. Delete temp order
         await TempOrder.deleteOne({ _id: tempOrder._id });
+        // Minus Ordered quantity In Every Product Stock
+        for (const item of orderedItems) {
+            const product = await Product.findById(item._id);
+            const updatedStock = product.stock - item.quantity;
+
+            await Product.findByIdAndUpdate(item._id, {
+                stock: updatedStock,
+            });
+        }
+
         // Remove  Cart Items From User Carts After Succes  Payment
         const userId = finalOrder.user;
         const orderedProductIds = finalOrder.items.map((item) =>

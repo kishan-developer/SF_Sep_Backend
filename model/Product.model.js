@@ -61,6 +61,14 @@ const productSchema = new mongoose.Schema(
             type: String,
             required: true,
         },
+        isOfferAplied: {
+            type: Boolean,
+            default: false,
+        },
+        offerDiscount: {
+            type: Number,
+            default: 0,
+        },
         reviews: [
             {
                 type: mongoose.Schema.Types.ObjectId,

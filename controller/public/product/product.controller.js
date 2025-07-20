@@ -11,7 +11,8 @@ const getAllProducts = asyncHandler(async (req, res) => {
                 path: "user",
                 model: "User",
             },
-        });
+        })
+        .exec();
     return res.success("Products Fetched Successfully.", products);
 });
 

@@ -72,7 +72,7 @@ const createProduct = asyncHandler(async (req, res) => {
     };
     // create new product
     const product = await Product.create(productPayload);
-    const allProducts = await Product.find({ });
+    const allProducts = await Product.find({});
     const allCategory = await Category.findOneAndUpdate(
         { name: "all" },
         {
@@ -115,7 +115,17 @@ const updateProduct = asyncHandler(async (req, res) => {
     if (!updatedProduct) {
         return res.error("Product not found or update failed.", 404);
     }
-    const allProducts = await Product.find({});
+    const allProducts = await Product.find({})
+        .populate("category")
+        .populate("fabric")
+        .populate({
+            path: "reviews",
+            populate: {
+                path: "user",
+                model: "User",
+            },
+        })
+        .exec();
     return res.success("Product Updated Successfully", allProducts);
 });
 
