@@ -10,7 +10,7 @@ yarn-debug.log*
 pnpm-debug.log*
 logs/
 *.log
-
+.env
 # OS files
 .DS_Store
 Thumbs.db
