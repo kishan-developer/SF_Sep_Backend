@@ -6,7 +6,7 @@
 const express = require("express");
 
 const User = require("../../../model/User.model");
-
+const Product = require("../../../model/Product.model");
 // ------------------------
 // 1. GET CART
 // ------------------------
@@ -26,6 +26,8 @@ exports.getCart = async (req, res) => {
 
             return {
                 ...product,
+                _id: product._id, // 1ab9
+                id: product._id,
                 quantity: item.quantity,
                 addons: {
                     withFallPico: item.addons.withFallPico,
@@ -35,7 +37,7 @@ exports.getCart = async (req, res) => {
                 totalPrice: item.totalPrice,
             };
         });
-
+        console.log("Cart Data ", cartProducts);
         res.status(200).json(cartProducts);
     } catch (err) {
         console.error("Error fetching cart:", err.message);
@@ -52,7 +54,7 @@ exports.getCart = async (req, res) => {
 // cartRouter.post("/add" );
 exports.addToCart = async (req, res) => {
     const { userId, product, quantity = 1, addons, finalPrice } = req.body;
-    console.log(req.body);
+    console.log(" add to cart product", product);
     try {
         const user = await User.findById(userId);
         if (!user) return res.status(404).json({ message: "User not found" });
@@ -87,16 +89,16 @@ exports.addToCart = async (req, res) => {
         );
 
         await user.save();
-        const updatedUser = await User.findById(userId).populate(
-            "cart.items.product"
-        );
+        const updatedUser = await User.findById(userId)
+            .populate("cart.items.product")
+            .exec();
 
         // Flatten cart items
         const flattenedCartItems = updatedUser.cart.items.map((item) => {
             const product = item.product.toObject(); // Convert Mongoose document to plain object
             return {
                 ...product, // Flatten product fields
-                _id: item._id, // Retain the cart item _id
+                _id: product._id, // Retain the cart item _id .....
                 finalPrice: item.finalPrice,
                 quantity: item.quantity,
                 totalPrice: item.totalPrice,
@@ -212,7 +214,7 @@ exports.mergeCart = async (req, res) => {
 
 exports.updateQuantity = async (req, res) => {
     const { userId, productId, withFallPico, withTassels, type } = req.body;
-    console.log("TYPE OF CHANGE ->", type);
+
     console.log(withFallPico, withTassels);
     if (!userId || !productId || !type)
         return res.status(400).json({ message: "Missing required fields" });
@@ -222,6 +224,11 @@ exports.updateQuantity = async (req, res) => {
 
     try {
         const user = await User.findById(userId);
+        const product = await Product.findById(productId);
+        console.log("Product Id  And Product", productId, product);
+        if (!product)
+            return res.status(404).json({ message: "Product not found" });
+
         if (!user) return res.status(404).json({ message: "User not found" });
 
         const cart = user.cart;
@@ -237,6 +244,9 @@ exports.updateQuantity = async (req, res) => {
 
         // Adjust quantity
         if (type === "increment") {
+            if (item.quantity === product.stock) {
+                return res.error(`Only ${product.stock} in stock`, 400);
+            }
             item.quantity += 1;
         } else {
             if (item.quantity === 1) {

@@ -57,7 +57,7 @@ const updateOffer = async (req, res) => {
 const adminGetOffer = async (req, res) => {
     try {
         const offer = await Offer.findOne();
-        console.log("Offer while fetching Offer ", offer);
+
         if (!offer) {
             return res.error("No active offer found.", 404);
         }

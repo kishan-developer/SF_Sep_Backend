@@ -15,7 +15,7 @@ const {
 } = require("./middleware/globalErrorHandler.middleware");
 const connectCloudinary = require("./config/cloudinary");
 const imageUploader = require("./utils/imageUpload.utils");
-const uploadRoutes = require("./routes/admin/upload.routes")
+const uploadRoutes = require("./routes/admin/upload.routes");
 const router = require("./routes/index.routes");
 // Connect Database
 connectDB(); // connect Database
@@ -26,11 +26,7 @@ const app = express();
 app.use(compression());
 app.use(cookieParser());
 
-const allowedOrigins = [
-    "https://srijanfabs.in",
-    "http://localhost:5173",
-    
-];
+const allowedOrigins = ["https://srijanfabs.in", "http://localhost:5173"];
 
 app.use(express.json());
 
@@ -75,9 +71,8 @@ app.use(sendCustomResponse);
 // Stating from this route localhost:8000/api/v1/auth/register
 app.use("/api/v1", router);
 
-
 app.get("/", (req, res) => {
-  res.send("Welcome to the API root");
+    res.send("Welcome to the API root");
 });
 
 // app.post("/files", uploadRoutes);
@@ -86,12 +81,11 @@ app.get("/", (req, res) => {
 //   res.json({ message: "Hello from API!" });
 // });
 
-
 app.use(notFound);
 app.use(globalErrorHandler);
 
 const PORT = process.env.PORT || 5679;
 
 app.listen(PORT, (err) => {
-  console.log(`Server running on http://localhost:${PORT}`);
+    console.log(`Server running on http://localhost:${PORT}`);
 });

@@ -41,7 +41,7 @@ const getProductByfabric = async (req, res) => {
     try {
         console.log(req.params);
         const { fabric, id } = req.params;
-        const title = fabric;
+        const title = fabric.replace(/-/g, " ");
         if (!title) {
             return res
                 .status(400)

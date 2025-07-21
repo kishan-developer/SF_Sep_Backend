@@ -32,15 +32,17 @@ exports.checkoutHandler = async (req, res) => {
         });
 
         // Optimised Items FOr Mongdb Schema
+        console.log("Payment checkout Order Itemsssss", items);
         const orderItems = items.map((item) => {
             return {
-                product: item?._id,
+                product: item.id,
                 quantity: item?.quantity,
                 withFallPico: item.addons.withFallPico,
                 withTassels: item.addons.withTassels,
                 isOfferAplied: items.isOfferAplied,
             };
         });
+        console.log("Payment checkout order items", orderItems);
         // 2. Save order in MongoDB
 
         const tempOrder = await TempOrder.create({
@@ -135,10 +137,14 @@ exports.paymentVerificationHandler = async (req, res) => {
         // 4. Delete temp order
         await TempOrder.deleteOne({ _id: tempOrder._id });
         // Minus Ordered quantity In Every Product Stock
+        console.log("Ordered Items ", orderedItems);
         for (const item of orderedItems) {
-            const product = await Product.findById(item._id);
-            const updatedStock = product.stock - item.quantity;
+            const product = await Product.findOne({ _id: item._id });
 
+            let updatedStock = product.stock - item.quantity;
+            if (updatedStock <= 0) {
+                updatedStock = 0;
+            }
             await Product.findByIdAndUpdate(item._id, {
                 stock: updatedStock,
             });

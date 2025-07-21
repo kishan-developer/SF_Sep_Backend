@@ -42,7 +42,8 @@ const updateCoupon = async (req, res) => {
         const now = new Date();
         const updated = await Coupon.findByIdAndUpdate(
             id,
-            { ...updateData, createdAt: now },
+            { ...updateData, createdAt: now, usageCount: 0 },
+
             {
                 new: true,
             }

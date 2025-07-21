@@ -3,7 +3,7 @@ const Offer = require("../../../model/Offer.model");
 const getOffer = async (req, res) => {
     try {
         const offer = await Offer.findOne();
-        console.log("Offer while fetching Offer ", offer);
+
         if (
             !offer ||
             !offer.status ||
