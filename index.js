@@ -4,29 +4,32 @@ const fileUplaod = require("express-fileupload");
 const cors = require("cors");
 const helmet = require("helmet");
 const compression = require("compression");
+const path = require("path");
 
-const ratelimit = require("./middleware/rateLimit.middleware");
 const notFound = require("./middleware/notFound.middleware");
 const sendCustomResponse = require("./middleware/customResponse.middleware");
 const connectDB = require("./config/connectDb");
 require("dotenv").config();
+
+
 const {
     globalErrorHandler,
 } = require("./middleware/globalErrorHandler.middleware");
-const connectCloudinary = require("./config/cloudinary");
-const imageUploader = require("./utils/imageUpload.utils");
-const uploadRoutes = require("./routes/admin/upload.routes");
+
+
 const router = require("./routes/index.routes");
+
 // Connect Database
 connectDB(); // connect Database
-connectCloudinary(); // connect cloudinary
+
 
 const app = express();
+
 // use compresstion
 app.use(compression());
 app.use(cookieParser());
-
-const allowedOrigins = ["https://srijanfabs.in", "http://localhost:5173"];
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+const allowedOrigins = ["http://localhost:5173",'https://srijanfabs.in','https://srijanfabs.com'];
 
 app.use(express.json());
 
@@ -35,7 +38,7 @@ app.use(
         extended: true,
     })
 );
-
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use(
     cors({
         origin: function (origin, callback) {
@@ -49,8 +52,7 @@ app.use(
     })
 );
 
-// Limit repeated requests (rate limiting)
-// app.use(ratelimit);
+
 
 // Secure HTTP headers to protect your app
 app.use(helmet());
@@ -74,12 +76,6 @@ app.use("/api/v1", router);
 app.get("/", (req, res) => {
     res.send("Welcome to the API root");
 });
-
-// app.post("/files", uploadRoutes);
-
-// app.get("/api/hello", (req, res) => {
-//   res.json({ message: "Hello from API!" });
-// });
 
 app.use(notFound);
 app.use(globalErrorHandler);

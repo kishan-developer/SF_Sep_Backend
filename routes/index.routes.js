@@ -12,9 +12,7 @@ const {
 } = require("../controller/public/product/category.controller");
 
 
-const  { manualUploader, streamUpload }  = require("../utils/imageUpload.utils");
-const deleteFromS3 = require("../utils/deleteFromS3.utils");
-// const imageUploader = require("../utils/imageUpload.utils");
+const imageUploader = require("../utils/imageUpload.utils");
 
 const userRoutes = require("./user/index.routes");
 const paymentRoutes = require("./payment.routes");
@@ -41,53 +39,45 @@ router.get("/categories", getAllCategories);
 router.get("/categories/:id", getCategoryById);
 router.get("/offer", getOffer);
 
-
-
 router.post("/upload", async (req, res) => {
-  try {
-    console.log("req.body", req.body);
-    const { type, identifier } = req.body;
-    const files = req.files?.files;
+    try {
+        const images = req.files?.files ?? null;
+        const imageFileName = req.body.name;
 
-    if (!files) return res.status(400).json({ success: false, message: "No files provided" });
+        if (!images) {
+            return res
+                .status(400)
+                .json({ success: false, message: "Please upload file first" });
+        }
 
-    const urls = await manualUploader( type, identifier, files);
-    res.status(200).json({ success: true, message: "Uploaded successfully", data: urls });
-  } catch (error) {
-    res.status(500).json({ success: false, message: "Upload error", error: error.message });
-  }
+        const imageList = Array.isArray(images) ? images : [images];
+
+        for (const image of imageList) {
+            if (image.size > 100 * 1024 * 1024) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Image should not be larger than 100MB",
+                });
+            }
+        }
+
+        const slugFIleName = imageFileName.trim().replace(/\s+/g, "-");
+        const result = await imageUploader(images, slugFIleName); // now uploads to local folder
+        return res.status(200).json({
+            success: true,
+            message: "Images uploaded successfully",
+            data: result,
+        });
+    } catch (err) {
+        console.error("Upload error:", err);
+        return res.status(500).json({
+            success: false,
+            message: "Server error",
+            error: err.message,
+        });
+    }
 });
 
-// delete image from s3 
-
-router.post("/delete-image", async (req, res) => {
-  try {
-    const { url } = req.body;
-
-    if (!url) {
-      return res.status(400).json({ success: false, message: "Image URL is required" });
-    }
-
-    // Extract the object key from the URL
-    const bucketBaseUrl = `https://${process.env.AWS_S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/`;
-    if (!url.startsWith(bucketBaseUrl)) {
-      return res.status(400).json({ success: false, message: "Invalid S3 URL" });
-    }
-
-    const key = url.replace(bucketBaseUrl, ""); // get the S3 key
-
-    await deleteFromS3(key);
-
-    res.status(200).json({
-      success: true,
-      message: "Image deleted successfully",
-      data: { key },
-    });
-  } catch (error) {
-    console.error("Delete error:", error);
-    res.status(500).json({ success: false, message: "Failed to delete image", error: error.message });
-  }
-});
 
 
 router.post("/bookVideoCall", async (req, res) => {

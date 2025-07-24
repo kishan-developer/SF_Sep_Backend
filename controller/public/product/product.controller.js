@@ -1,6 +1,9 @@
 const Product = require("../../../model/Product.model");
+const { client } = require('../../../utils/redisClient');
 
 const asyncHandler = require("express-async-handler");
+
+
 const getAllProducts = asyncHandler(async (req, res) => {
     const products = await Product.find({})
         .populate("category")
