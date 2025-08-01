@@ -44,7 +44,7 @@ app.use(cookieParser());
 
 // <<<<<<< HEAD
 // app.use("/uploads", express.static(path.join(__dirname, "uploads")));
-const allowedOrigins = ["http://localhost:5173"];
+const allowedOrigins = ["https://srijanfabs.com/"];
 // =======
 
 // const allowedOrigins = [
