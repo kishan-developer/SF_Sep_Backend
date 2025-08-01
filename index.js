@@ -5,31 +5,55 @@ const cors = require("cors");
 const helmet = require("helmet");
 const compression = require("compression");
 const path = require("path");
-
+const ratelimit = require("./middleware/rateLimit.middleware");
 const notFound = require("./middleware/notFound.middleware");
 const sendCustomResponse = require("./middleware/customResponse.middleware");
 const connectDB = require("./config/connectDb");
 require("dotenv").config();
 
+// const { connectRedis } = require("./utils/redisClient.js");
 
 const {
     globalErrorHandler,
 } = require("./middleware/globalErrorHandler.middleware");
 
 
+// const connectCloudinary = require("./config/cloudinary");
+// const imageUploader = require("./utils/imageUpload.utils.js");
+// const uploadRoutes = require("./routes/admin/upload.routes");
 const router = require("./routes/index.routes");
 
 // Connect Database
 connectDB(); // connect Database
-
+// connectCloudinary(); // connect cloudinary
 
 const app = express();
+
+// connectRedis();
+
+// increase api response
+// const client = await createClient()
+//     .on('error', (err)=> console.log('Redis Client Error', err))
+//     .connect();
+
 
 // use compresstion
 app.use(compression());
 app.use(cookieParser());
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
-const allowedOrigins = ["http://localhost:5173",'https://srijanfabs.in','https://srijanfabs.com'];
+
+
+// <<<<<<< HEAD
+// app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+const allowedOrigins = ["http://localhost:5173"];
+// =======
+
+// const allowedOrigins = [
+//     "https://srijanfabs.in",
+//     "http://localhost:5173",
+//     "http://192.168.1.26:5555",
+//     "https://shreejan-fab-frontend.vercel.app",
+// ];
+// >>>>>>> 40052de (Update index.js)
 
 app.use(express.json());
 
@@ -38,7 +62,12 @@ app.use(
         extended: true,
     })
 );
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+
+// app.use("/uploads", express.static(path.join(__dirname, "uploads"))); - Old
+
+app.use("/images", express.static(path.join(__dirname, "uploads/images"))); // new path for images
+ 
+
 app.use(
     cors({
         origin: function (origin, callback) {
@@ -52,7 +81,8 @@ app.use(
     })
 );
 
-
+// Limit repeated requests (rate limiting)
+// app.use(ratelimit);
 
 // Secure HTTP headers to protect your app
 app.use(helmet());
