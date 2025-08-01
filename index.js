@@ -71,6 +71,13 @@ app.get("/", (req, res) => {
   res.send("Welcome to the API root SRIJNFBS...");
 });
 
+
+// Default route
+app.get("/dev", (req, res) => {
+  res.send("THIS PROJECT IS BUILD BY KISHAN KUMAR RAY");
+});
+
+
 // 404 handler
 app.use(notFound);
 
