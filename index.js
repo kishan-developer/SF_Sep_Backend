@@ -1,117 +1,84 @@
 const express = require("express");
 const cookieParser = require("cookie-parser");
-const fileUplaod = require("express-fileupload");
+const fileUpload = require("express-fileupload");
 const cors = require("cors");
 const helmet = require("helmet");
 const compression = require("compression");
 const path = require("path");
+const dotenv = require("dotenv");
 const ratelimit = require("./middleware/rateLimit.middleware");
 const notFound = require("./middleware/notFound.middleware");
 const sendCustomResponse = require("./middleware/customResponse.middleware");
 const connectDB = require("./config/connectDb");
-require("dotenv").config();
-
-// const { connectRedis } = require("./utils/redisClient.js");
-
-const {
-    globalErrorHandler,
-} = require("./middleware/globalErrorHandler.middleware");
-
-
-// const connectCloudinary = require("./config/cloudinary");
-// const imageUploader = require("./utils/imageUpload.utils.js");
-// const uploadRoutes = require("./routes/admin/upload.routes");
+const { globalErrorHandler } = require("./middleware/globalErrorHandler.middleware");
 const router = require("./routes/index.routes");
 
-// Connect Database
-connectDB(); // connect Database
-// connectCloudinary(); // connect cloudinary
+dotenv.config();
 
+// Connect to MongoDB
+connectDB();
+
+// Initialize app
 const app = express();
 
-// connectRedis();
-
-// increase api response
-// const client = await createClient()
-//     .on('error', (err)=> console.log('Redis Client Error', err))
-//     .connect();
-
-
-// use compresstion
+// Middlewares
 app.use(compression());
 app.use(cookieParser());
-
-
-// <<<<<<< HEAD
-// app.use("/uploads", express.static(path.join(__dirname, "uploads")));
-const allowedOrigins = ["https://srijanfabs.com/"];
-// =======
-
-// const allowedOrigins = [
-//     "https://srijanfabs.in",
-//     "http://localhost:5173",
-//     "http://192.168.1.26:5555",
-//     "https://shreejan-fab-frontend.vercel.app",
-// ];
-// >>>>>>> 40052de (Update index.js)
-
 app.use(express.json());
-
 app.use(
-    express.urlencoded({
-        extended: true,
-    })
+  express.urlencoded({
+    extended: true,
+  })
 );
 
-// app.use("/uploads", express.static(path.join(__dirname, "uploads"))); - Old
+// Serve static images from uploads/images
+app.use("/images", express.static(path.join(__dirname, "uploads/images")));
 
-app.use("/images", express.static(path.join(__dirname, "uploads/images"))); // new path for images
- 
-
+// CORS settings
+const allowedOrigins = ["https://srijanfabs.com"];
 app.use(
-    cors({
-        origin: function (origin, callback) {
-            if (!origin || allowedOrigins.includes(origin)) {
-                callback(null, true);
-            } else {
-                callback(new Error("Not allowed by CORS"));
-            }
-        },
-        credentials: true,
-    })
+  cors({
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
+  })
 );
 
-// Limit repeated requests (rate limiting)
-// app.use(ratelimit);
-
-// Secure HTTP headers to protect your app
+// Security headers
 app.use(helmet());
 
-// Sanitize input to prevent NoSQL injection attacks
-
-// Handle file uploads, with temporary storage for large files
+// File upload
 app.use(
-    fileUplaod({
-        useTempFiles: true,
-        tempFileDir: "/tmp",
-    })
+  fileUpload({
+    useTempFiles: true,
+    tempFileDir: "/tmp",
+  })
 );
 
+// Custom response handler
 app.use(sendCustomResponse);
-// Routes For Login, Register, Send-Otp, Forgott-Password, Reset Password
 
-// Stating from this route localhost:8000/api/v1/auth/register
+// API routes
 app.use("/api/v1", router);
 
+// Default route
 app.get("/", (req, res) => {
-    res.send("Welcome to the API root");
+  res.send("Welcome to the API root");
 });
 
+// 404 handler
 app.use(notFound);
+
+// Global error handler
 app.use(globalErrorHandler);
 
+// Start server
 const PORT = process.env.PORT || 5679;
-
-app.listen(PORT, (err) => {
-    console.log(`Server running on http://localhost:${PORT}`);
+app.listen(PORT, () => {
+  console.log(`Server running on http://localhost:${PORT}`);
 });
