@@ -68,7 +68,7 @@ app.use("/api/v1", router);
 
 // Default route
 app.get("/", (req, res) => {
-  res.send("Welcome to the API root SRIJNFBS");
+  res.send("Welcome to the API root SRIJNFBS...");
 });
 
 // 404 handler
