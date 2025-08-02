@@ -92,8 +92,8 @@
 const fs = require("fs");
 const path = require("path");
 
-const imageUploader = async (file, imageFileName, productName) => {
-    const baseUploadPath = `/root/uploads/image/products/${productName}`;
+const imageUploader = async (file,imageFileName, imageFileName) => {
+    const baseUploadPath = `/root/uploads/image/products/${imageFileName}`;
     
     if (!fs.existsSync(baseUploadPath)) {
         fs.mkdirSync(baseUploadPath, { recursive: true });
@@ -107,7 +107,7 @@ const imageUploader = async (file, imageFileName, productName) => {
 
             fileObj.mv(filePath, (err) => {
                 if (err) return reject(err);
-                resolve(`${process.env.BACKEND_URL}/images/products/${productName}/${fileName}`);
+                resolve(`${process.env.BACKEND_URL}/images/products/${imageFileName}/${fileName}`);
             });
         });
     };
