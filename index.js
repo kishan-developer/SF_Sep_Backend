@@ -34,7 +34,7 @@ app.use(
 // Serve static images from uploads/images
 // app.use("/images", express.static(path.join(__dirname, "uploads/images")));
 
-// app.use("/images", express.static(path.join(__dirname, "/root/uploads/image")));
+app.use("/images", express.static(path.join(__dirname, "/root/uploads/image")));
 
 // Serve images from /root/uploads/image at /images URL
 // app.use("/images", express.static("/root/uploads/image"));
