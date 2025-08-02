@@ -62,7 +62,7 @@ router.post("/upload", async (req, res) => {
         }
 
         const slugFIleName = imageFileName.trim().replace(/\s+/g, "-");
-        const result = await imageUploader(images, slugFIleName,slugFIleName); // now uploads to local folder
+        const result = await imageUploader(images, slugFIleName); // now uploads to local folder
         return res.status(200).json({
             success: true,
             message: "Images uploaded successfully",
