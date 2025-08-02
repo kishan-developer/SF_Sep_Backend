@@ -134,7 +134,7 @@ const updateOffer = async (req, res) => {
 
         if (existingOffer && !existingOffer._id.equals(offer._id)) {
             return res.error(
-                An offer with ${updateData.discount}% discount already exists.,
+                `An offer with ${updateData.discount}% discount already exists.`,
                 400
             );
         }
