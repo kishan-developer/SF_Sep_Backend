@@ -88,12 +88,11 @@
 
 
 /// store image in VPS ROOT/Uploads
-
 const fs = require("fs");
 const path = require("path");
 
-const imageUploader = async (file,imageFileName, imageFileName) => {
-    const baseUploadPath = `/root/uploads/image/products/${imageFileName}`;
+const imageUploader = async (file, imageFileName) => {
+    const baseUploadPath = `/root/uploads/image/products`;
     
     if (!fs.existsSync(baseUploadPath)) {
         fs.mkdirSync(baseUploadPath, { recursive: true });
@@ -107,7 +106,7 @@ const imageUploader = async (file,imageFileName, imageFileName) => {
 
             fileObj.mv(filePath, (err) => {
                 if (err) return reject(err);
-                resolve(`${process.env.BACKEND_URL}/images/products/${imageFileName}/${fileName}`);
+                resolve(`${process.env.BACKEND_URL}/images/products/${fileName}`);
             });
         });
     };
