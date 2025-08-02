@@ -32,7 +32,9 @@ app.use(
 );
 
 // Serve static images from uploads/images
-app.use("/images", express.static(path.join(__dirname, "uploads/images")));
+// app.use("/images", express.static(path.join(__dirname, "uploads/images")));
+
+app.use("/images", express.static(path.join(__dirname, "/root/actions-runner/uploads")));
 
 // CORS settings
 const allowedOrigins = ["https://srijanfabs.com"];
