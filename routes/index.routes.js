@@ -21,7 +21,11 @@ const bookVideoCallTemplate = require("../email/template/bookVideoCallTemplate")
 const bookVideoCallAdminTemplate = require("../email/template/bookVideoCallAdminTemplate");
 const Newsletter = require("../model/Newsletter.model");
 const contactEmailTemplate = require("../email/template/contactEmailTemplate");
-const { getOffer } = require("../controller/public/product/offer.controller");
+const {
+    getOffer,
+    getOfferOfProduct,
+} = require("../controller/public/product/offer.controller");
+
 
 const router = express.Router();
 
@@ -38,6 +42,7 @@ router.get("/products/:fabric/:id", getProductByfabric);
 router.get("/categories", getAllCategories);
 router.get("/categories/:id", getCategoryById);
 router.get("/offer", getOffer);
+router.get("/offer/:productId", getOfferOfProduct);
 
 router.post("/upload", async (req, res) => {
     try {
