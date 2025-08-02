@@ -13,6 +13,7 @@ const PRODUCT_ALLOWED_FIELDS = [
     "assurance",
     "hsnCode",
     "isOfferAplied",
+    "offerDiscount"
 ];
 
 const CATEGORY_ALLOWED_FIELDS = ["name", "description", "image"];
