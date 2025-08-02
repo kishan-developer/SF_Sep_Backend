@@ -25,6 +25,7 @@ const app = express();
 app.use(compression());
 app.use(cookieParser());
 app.use(express.json());
+
 app.use(
   express.urlencoded({
     extended: true,
@@ -34,10 +35,10 @@ app.use(
 // Serve static images from uploads/images
 // app.use("/images", express.static(path.join(__dirname, "uploads/images")));
 
-app.use("/images", express.static(path.join(__dirname, "/root/actions-runner/uploads")));
+app.use("/images", express.static(path.join(__dirname, "/root/uploads")));
 
 // CORS settings
-const allowedOrigins = ["https://srijanfabs.com"];
+const allowedOrigins = ["http://localhost:5173/"];
 app.use(
   cors({
     origin: function (origin, callback) {
