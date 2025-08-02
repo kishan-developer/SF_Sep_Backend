@@ -142,6 +142,7 @@ userSchema.methods.generateToken = function () {
         { expiresIn: "2d" }
     );
 };
+
 userSchema.methods.generateRefreshToken = function name() {
     return jwt.sign(
         {
