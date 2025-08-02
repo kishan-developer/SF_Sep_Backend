@@ -25,7 +25,6 @@ const app = express();
 app.use(compression());
 app.use(cookieParser());
 app.use(express.json());
-
 app.use(
   express.urlencoded({
     extended: true,
@@ -35,10 +34,16 @@ app.use(
 // Serve static images from uploads/images
 // app.use("/images", express.static(path.join(__dirname, "uploads/images")));
 
-app.use("/images", express.static(path.join(__dirname, "/root/uploads")));
+// app.use("/images", express.static(path.join(__dirname, "/root/uploads/image")));
+
+// Serve static files from /root/uploads/image/products
+app.use("/images/products", express.static("/root/uploads/image/products"));
+
+// Serve images from /root/uploads/image at /images URL
+// app.use("/images", express.static("/root/uploads/image"));
 
 // CORS settings
-const allowedOrigins = ["http://localhost:5173/"];
+const allowedOrigins = ["https://srijanfabs.com"];
 app.use(
   cors({
     origin: function (origin, callback) {
@@ -71,14 +76,10 @@ app.use("/api/v1", router);
 
 // Default route
 app.get("/", (req, res) => {
-  res.send("Welcome to the API root SRIJNFBS");
+  res.send("Welcome to the API root SRIJNFBS....//");
 });
 
 
-// Default route
-app.get("/dev", (req, res) => {
-  res.send("THIS PROJECT IS BUILD BY KISHAN KUMAR RAY");
-});
 
 
 
