@@ -43,7 +43,7 @@ app.use("/images/products", express.static("/root/uploads/image/products"));
 // app.use("/images", express.static("/root/uploads/image"));
 
 // CORS settings
-const allowedOrigins = ["https://srijanfabs.com"];
+const allowedOrigins = ["http://localhost:5173"];
 app.use(
   cors({
     origin: function (origin, callback) {

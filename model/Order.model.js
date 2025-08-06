@@ -139,7 +139,7 @@ const orderSchema = new mongoose.Schema(
             street: String,
             city: String,
             state: String,
-            zip: String,
+            postalCode: String,
             country: String,
             phone: String,
         },

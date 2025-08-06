@@ -18,26 +18,11 @@ const createProduct = asyncHandler(async (req, res) => {
         weight,
         assurance,
         hsnCode,
-        reviews,
-        images,
+        reviews = [],
+        images = [],
     } = req.body;
 
-    console.log(
-        name,
-        description,
-        price,
-        category,
-        stock,
-        fabric,
-        technique,
-        color,
-        weight,
-        assurance,
-        hsnCode,
-        reviews,
-        images
-    );
-    // get product details from Body Check Is Everything  Was There Or Not ?
+    // Validate required fields
     if (
         !name ||
         !description ||
@@ -52,7 +37,13 @@ const createProduct = asyncHandler(async (req, res) => {
         !hsnCode ||
         !images
     ) {
-        return res.error(`All fields are required.`, 400);
+        return res.error("All required fields must be filled properly.", 400);
+    }
+
+    // Check if category exists
+    const targetCategory = await Category.findById(category);
+    if (!targetCategory) {
+        return res.error("Provided category does not exist", 404);
     }
 
     const productPayload = {
@@ -70,52 +61,22 @@ const createProduct = asyncHandler(async (req, res) => {
         reviews,
         images,
     };
-    // create new product
+
+    // Create product
     const product = await Product.create(productPayload);
-    const allProducts = await Product.find({});
-    const allCategory = await Category.findOneAndUpdate(
+
+    // Add to 'all' category
+    await Category.findOneAndUpdate(
         { name: "all" },
-        {
-            $push: { products: product._id },
-        }
+        { $addToSet: { products: product._id } }
     );
-    const updatedCategory = await Category.findByIdAndUpdate(category, {
-        $push: { products: product._id },
+
+    // Add to specified category
+    await Category.findByIdAndUpdate(category, {
+        $addToSet: { products: product._id },
     });
-    return res.success("Product Created Successfully.", allProducts);
-});
-
-const updateProduct = asyncHandler(async (req, res) => {
-    // get product data
-    const _id = req.params?.id || req.body?.id;
-    let productPayload = req.body ?? null;
-    if (!_id) {
-        return res.error("Product Id is required", 400);
-    }
-    // Check Is Payload Is Not Empty
-    if (!productPayload || Object.keys(productPayload).length == 0) {
-        return res.error("Please provide fields to update", 400);
-    }
-
-    const sanitizedPayload = sanitizePayload(
-        productPayload,
-        PRODUCT_ALLOWED_FIELDS
-    );
-    if (Object.keys(sanitizedPayload).length == 0) {
-        return res.error("All input values are either invalid or empty.", 404);
-    }
-    const updatedProduct = await Product.findByIdAndUpdate(
-        _id,
-        sanitizedPayload,
-        {
-            new: true,
-            runValidators: true,
-        }
-    );
-    if (!updatedProduct) {
-        return res.error("Product not found or update failed.", 404);
-    }
     const allProducts = await Product.find({})
+        .sort({ createdAt: -1 })
         .populate("category")
         .populate("fabric")
         .populate({
@@ -126,19 +87,107 @@ const updateProduct = asyncHandler(async (req, res) => {
             },
         })
         .exec();
-    return res.success("Product Updated Successfully", allProducts);
+
+    return res.success("Product created successfully.", allProducts);
+});
+
+const updateProduct = asyncHandler(async (req, res) => {
+    const _id = req.params?.id || req.body?.id;
+    const payload = req.body;
+
+    if (!_id) return res.error("Product ID is required", 400);
+    if (!payload || Object.keys(payload).length === 0)
+        return res.error("No fields provided to update", 400);
+
+    const product = await Product.findById(_id);
+    if (!product) return res.error("Product not found", 404);
+
+    const oldCategoryId = product.category?.toString();
+    const newCategoryId = payload.category?.toString();
+
+    const sanitizedPayload = sanitizePayload(payload, PRODUCT_ALLOWED_FIELDS);
+    if (Object.keys(sanitizedPayload).length === 0)
+        return res.error("No valid fields to update", 400);
+
+    // Update product (category is part of payload)
+    const updatedProduct = await Product.findByIdAndUpdate(
+        _id,
+        sanitizedPayload,
+        {
+            new: true,
+            runValidators: true,
+        }
+    );
+
+    // If category changed, update references
+    if (newCategoryId && newCategoryId !== oldCategoryId) {
+        // Remove product from old category
+        if (oldCategoryId) {
+            await Category.findByIdAndUpdate(oldCategoryId, {
+                $pull: { products: _id },
+            });
+        }
+
+        // Add product to new category
+        await Category.findByIdAndUpdate(newCategoryId, {
+            $addToSet: { products: _id },
+        });
+    }
+
+    const allProducts = await Product.find({})
+        .sort({ createdAt: -1 })
+        .populate("category")
+        .populate("fabric")
+        .populate({
+            path: "reviews",
+            populate: {
+                path: "user",
+                model: "User",
+            },
+        })
+        .exec();
+    return res.success("Product category updated successfully", allProducts);
 });
 
 const deleteProduct = asyncHandler(async (req, res) => {
     const _id = req.body?.id || req.params.id;
     if (!_id) {
-        return res.error("Products Id Are Required", 400);
+        return res.error("Product ID is required", 400);
     }
+
+    // Find the product first to get its category
+    const product = await Product.findById(_id);
+    if (!product) {
+        return res.error("Product not found", 404);
+    }
+
+    // Delete the product
     const deletedProduct = await Product.findByIdAndDelete(_id);
-    if (!deletedProduct) {
-        return res.error("Product Not Found", 404);
-    }
-    return res.success("Product Deleted Successfully", deletedProduct);
+
+    // Remove product from the 'all' category
+    await Category.findOneAndUpdate(
+        { name: "all" },
+        { $pull: { products: _id } }
+    );
+
+    // Remove product from its original category
+    await Category.findByIdAndUpdate(product.category, {
+        $pull: { products: _id },
+    });
+
+    const allProducts = await Product.find({})
+        .sort({ createdAt: -1 })
+        .populate("category")
+        .populate("fabric")
+        .populate({
+            path: "reviews",
+            populate: {
+                path: "user",
+                model: "User",
+            },
+        })
+        .exec();
+    return res.success("Product deleted successfully", allProducts);
 });
 
 module.exports = {

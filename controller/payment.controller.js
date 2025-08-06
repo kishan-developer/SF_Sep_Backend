@@ -242,6 +242,11 @@ const Product = require("../model/Product.model");
 const Address = require("../model/Adress.model");
 const TempOrder = require("../model/TempOrder.model");
 const User = require("../model/User.model");
+const mailSender = require("../utils/mailSender.utils");
+const adminOrderNotificationTemplate = require("../email/template/adminOrderNotificationTemplate");
+const userOrderConfirmationTemplate = require("../email/template/userOrderConfirmationTemplate");
+
+
 exports.checkoutHandler = async (req, res) => {
     try {
         const { amount, userId, items, addressId, discount = 0 } = req.body;
@@ -308,7 +313,7 @@ exports.paymentVerificationHandler = async (req, res) => {
 
         if (!isAuthentic) {
             return res.redirect(
-                `${process.env.FRONTEND_URL}/paymentFailed?reason=Invalid signature`
+                `${process.env.FRONTEND_URL}/paymentFailed?reason=Invalid_signature`
             );
         }
 
@@ -317,7 +322,7 @@ exports.paymentVerificationHandler = async (req, res) => {
 
         if (!tempOrder) {
             return res.redirect(
-                `${process.env.FRONTEND_URL}/paymentFailed?reason=Order not found`
+                `${process.env.FRONTEND_URL}/paymentFailed?reason=Order_not_found`
             );
         }
 
@@ -402,9 +407,34 @@ exports.paymentVerificationHandler = async (req, res) => {
                 }
             );
         }
+        // 1. Safely populate order for email only
+        const populatedOrder = await Order.findById(finalOrder._id)
+            .populate({
+                path: "items.product",
+                select: "name price images",
+            })
+            .exec();
+
+        // 2. Send email with populated data
+        const htmlBodyAdmin = adminOrderNotificationTemplate(populatedOrder, user);
+        const htmlBodyUser = userOrderConfirmationTemplate(
+            populatedOrder,
+            user
+        );
+
+        await mailSender(
+            "srijanfabs@gmail.com",
+            "New Order Received",
+            htmlBodyAdmin
+        );
+        await mailSender(
+            user.email,
+            "Your Order Confirmation - Srijan Fabs",
+            htmlBodyUser
+        );
         // 5. Redirect to success
         return res.redirect(
-            `${process.env.FRONTEND_URL}/paymentSuccess?reference=${razorpay_payment_id}`
+           ` ${process.env.FRONTEND_URL}/paymentSuccess?reference=${razorpay_payment_id}`
         );
     } catch (error) {
         console.error("Error in payment verification:", error);
