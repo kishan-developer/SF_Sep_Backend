@@ -1,27 +1,23 @@
-const { S3Client, DeleteObjectCommand } = require("@aws-sdk/client-s3");
-require("dotenv").config();
+const fs = require("fs");
+const path = require("path");
 
-const s3 = new S3Client({
-  region: process.env.AWS_REGION,
-  credentials: {
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-  },
-});
+const deleteImage = async (imageUrl) => {
+    try {
+        // Example: imageUrl = `${process.env.BACKEND_URL}/images/products/filename.jpg`
+        const fileName = path.basename(imageUrl); // Extract only the filename
+        const filePath = path.join(`/root/uploads/image/products`, fileName);
 
-/**
- * Delete an image from AWS S3
- * @param {string} key - S3 object key (e.g., "uploads/products/product_123/image.jpg")
- */
-
-const deleteFromS3 = async (key) => {
-  const params = {
-    Bucket: process.env.AWS_S3_BUCKET_NAME,
-    Key: key,
-  };
-
-  const command = new DeleteObjectCommand(params);
-  await s3.send(command);
+        if (fs.existsSync(filePath)) {
+            fs.unlinkSync(filePath);
+            console.log(`Image deleted: ${fileName}`);
+            return { success: true, message: "Image deleted successfully" };
+        } else {
+            return { success: false, message: "Image not found" };
+        }
+    } catch (err) {
+        console.error("Error deleting image:", err);
+        return { success: false, message: "Error deleting image" };
+    }
 };
 
-module.exports = deleteFromS3;
+module.exports = deleteImage;

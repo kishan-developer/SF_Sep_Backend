@@ -13,5 +13,6 @@ const {
 } = require("../../controller/admin/product.controller");
 productRouter.post("/create", createProduct);
 productRouter.put("/update/:id", updateProduct);
+productRouter.delete("/delete/:id", deleteProduct);
 
 module.exports = productRouter;

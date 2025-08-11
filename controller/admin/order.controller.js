@@ -65,9 +65,15 @@ const getOrderById = async (req, res) => {
 };
 
 const updateDelhiveryReceipt = async (req, res) => {
-    const { delhiveryReceipt, orderId } = req.body;
-    if (!delhiveryReceipt) {
-        return res.error("Please provide image", 404);
+    const {
+        delhiveryReceipt,
+        orderId,
+        trackingId,
+        parcelWeight,
+        deliveryPartner,
+    } = req.body;
+    if (!delhiveryReceipt || !trackingId || !parcelWeight || !deliveryPartner) {
+        return res.error("Please provide all data", 400);
     }
     const order = await Order.findById(orderId);
     if (!order) {
@@ -75,9 +81,13 @@ const updateDelhiveryReceipt = async (req, res) => {
     }
 
     order.delhiveryReceipt = delhiveryReceipt;
+    order.trackingId = trackingId;
+    order.parcelWeight = parcelWeight;
+    order.deliveryPartner = deliveryPartner;
     order.save();
     return res.success("Delhivery Receipt Uploaded Successfully");
 };
+
 
 module.exports = {
     getOrders,
