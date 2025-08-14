@@ -1,7 +1,8 @@
 const Product = require("../../../model/Product.model");
 const { client } = require('../../../utils/redisClient');
 const NodeCache = require("node-cache");
-const productCache = new NodeCache({ stdTTL: 300, checkperiod: 320 }); // TTL = 5 min
+const productCache = new NodeCache({ stdTTL: 86400, checkperiod: 900 }); 
+ // TTL (Time to Live) =  1 day = 24 hours = 24 × 60 × 60 = 86400 seconds
 
 const asyncHandler = require("express-async-handler");
 
@@ -88,7 +89,7 @@ const getAllProducts = asyncHandler(async (req, res) => {
 
 const getProductById = asyncHandler(async (req, res) => {
     const _id = req.body?.id || req.params.id;
-    
+
     if (!_id) {
         return res.error("Products Id Are Required", 400);
     }

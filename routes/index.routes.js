@@ -1,5 +1,7 @@
 const express = require("express");
+const sharp = require("sharp");
 const authRoutes = require("../routes/auth.routes");
+
 const adminRoutes = require("../routes/admin/index.routes");
 const {
     getAllProducts,
@@ -44,15 +46,57 @@ router.get("/categories/:id", getCategoryById);
 router.get("/offer", getOffer);
 router.get("/offer/:productId", getOfferOfProduct);
 
-router.post("/upload", async (req, res) => {
+
+// router.post("/uploads", async (req, res) => {
+
+//     // console.log("/upload Route")
+//   try {
+//     const images = req.files?.files ?? null;
+//     const imageFileName = req.body.name;
+
+//     if (!images) {
+//       return res.status(400).json({ success: false, message: "Please upload file first" });
+//     }
+
+//     const imageList = Array.isArray(images) ? images : [images];
+
+//     for (const image of imageList) {
+//       if (image.size > 100 * 1024 * 1024) {
+//         return res.status(400).json({
+//           success: false,
+//           message: "Image should not be larger than 100MB",
+//         });
+//       }
+//     }
+
+//     const slugFileName = imageFileName.trim().replace(/\s+/g, "-");
+
+//     const result = await imageUploader(images, slugFileName);
+
+//     return res.status(200).json({
+//       success: true,
+//       message: "Images uploaded successfully",
+//       data: result, // Array of Cloudinary URLs
+//     });
+//   } catch (err) {
+//     // console.error("Upload error:", err);
+//     return res.status(500).json({
+//       success: false,
+//       message: "Server error",
+//       error: err.message,
+//     });
+//   }
+// });
+
+
+
+router.post("/uploads", async (req, res) => {
     try {
         const images = req.files?.files ?? null;
         const imageFileName = req.body.name;
 
         if (!images) {
-            return res
-                .status(400)
-                .json({ success: false, message: "Please upload file first" });
+            return res.status(400).json({ success: false, message: "Please upload file first" });
         }
 
         const imageList = Array.isArray(images) ? images : [images];
@@ -66,15 +110,33 @@ router.post("/upload", async (req, res) => {
             }
         }
 
-        const slugFIleName = imageFileName.trim().replace(/\s+/g, "-");
-        const result = await imageUploader(images, slugFIleName); // now uploads to local folder
+        const slugFileName = imageFileName.trim().replace(/\s+/g, "-");
+
+        const processedImages = [];
+
+        for (const image of imageList) {
+            // Compress & resize image using Sharp
+            const compressedBuffer = await sharp(image.data)
+                .resize({ width: 1200 }) // Resize width (optional)
+                .jpeg({ quality: 80 })   // Convert to JPEG and set quality
+                .toBuffer();
+
+            // Save processed image temporarily for Cloudinary
+            const tempFilePath = `/tmp/${Date.now()}-${slugFileName}.jpg`;
+            await sharp(compressedBuffer).toFile(tempFilePath);
+
+            // Upload to Cloudinary
+            const uploadResult = await imageUploader({ tempFilePath }, slugFileName);
+            processedImages.push(uploadResult);
+        }
+
         return res.status(200).json({
             success: true,
             message: "Images uploaded successfully",
-            data: result,
+            data: processedImages,
         });
+
     } catch (err) {
-        console.error("Upload error:", err);
         return res.status(500).json({
             success: false,
             message: "Server error",

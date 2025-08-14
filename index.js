@@ -12,14 +12,23 @@ const sendCustomResponse = require("./middleware/customResponse.middleware");
 const connectDB = require("./config/connectDb");
 const { globalErrorHandler } = require("./middleware/globalErrorHandler.middleware");
 const router = require("./routes/index.routes");
+const {connectCloudinary} = require("./config/cloudinary");
+
+
+
+const NodeCache = require("node-cache");
+const productCache = new NodeCache({ stdTTL: 86400, checkperiod: 900 }); 
 
 dotenv.config();
 
 // Connect to MongoDB
 connectDB();
 
+
 // Initialize app
 const app = express();
+
+connectCloudinary();
 
 // Middlewares
 app.use(compression());
@@ -31,19 +40,12 @@ app.use(
   })
 );
 
-// Serve static images from uploads/images
-// app.use("/images", express.static(path.join(__dirname, "uploads/images")));
 
-// app.use("/images", express.static(path.join(__dirname, "/root/uploads/image")));
 
-// Serve static files from /root/uploads/image/products
-app.use("/images/products", express.static("/root/uploads/image/products"));
-
-// Serve images from /root/uploads/image at /images URL
-// app.use("/images", express.static("/root/uploads/image"));
 
 // CORS settings
-const allowedOrigins = ["https://srijanfabs.com"];
+const allowedOrigins = ["http://localhost:5173"];
+
 app.use(
   cors({
     origin: function (origin, callback) {

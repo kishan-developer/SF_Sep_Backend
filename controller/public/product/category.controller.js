@@ -31,6 +31,7 @@
 const Category = require("../../../model/Category.model");
 
 const asyncHandler = require("express-async-handler");
+
 const getAllCategories = asyncHandler(async (req, res) => {
     const categories = await Category.find({}).sort({ createdAt: -1 })
     ;
@@ -38,10 +39,13 @@ const getAllCategories = asyncHandler(async (req, res) => {
 });
 
 const getCategoryById = asyncHandler(async (req, res) => {
+
     const _id = req.body?.id || req.params.id;
+
     if (!_id) {
         return res.error("Category Id Are Required", 400);
     }
+
     const category = await Category.findById(_id)
         .sort({ createdAt: -1 })
         .populate({
