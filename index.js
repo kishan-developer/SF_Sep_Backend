@@ -65,7 +65,7 @@ app.use(helmet());
 // File upload
 app.use(
   fileUpload({
-    useTempFiles: true,
+    useTempFiles: false,   
     tempFileDir: "/tmp",
   })
 );

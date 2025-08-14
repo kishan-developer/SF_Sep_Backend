@@ -90,7 +90,7 @@ router.get("/offer/:productId", getOfferOfProduct);
 
 
 
-router.post("/uploads", async (req, res) => {
+router.post("/upload", async (req, res) => {
     try {
         const images = req.files?.files ?? null;
         const imageFileName = req.body.name;
@@ -100,52 +100,40 @@ router.post("/uploads", async (req, res) => {
         }
 
         const imageList = Array.isArray(images) ? images : [images];
-
-        for (const image of imageList) {
-            if (image.size > 100 * 1024 * 1024) {
-                return res.status(400).json({
-                    success: false,
-                    message: "Image should not be larger than 100MB",
-                });
-            }
-        }
-
         const slugFileName = imageFileName.trim().replace(/\s+/g, "-");
 
         const processedImages = [];
 
         for (const image of imageList) {
-            // Compress & resize image using Sharp
+            if (!image.data || image.data.length === 0) {
+                return res.status(400).json({ success: false, message: "Uploaded image is empty" });
+            }
+
+            // Process with Sharp (compress + resize)
             const compressedBuffer = await sharp(image.data)
-                .resize({ width: 1200 }) // Resize width (optional)
-                .jpeg({ quality: 80 })   // Convert to JPEG and set quality
+                .resize({ width: 1200 })
+                .jpeg({ quality: 80 })
                 .toBuffer();
 
-            // Save processed image temporarily for Cloudinary
-            const tempFilePath = `/tmp/${Date.now()}-${slugFileName}.jpg`;
-            await sharp(compressedBuffer).toFile(tempFilePath);
-
-            // Upload to Cloudinary
-            const uploadResult = await imageUploader({ tempFilePath }, slugFileName);
+            // Pass buffer directly to Cloudinary
+            const uploadResult = await imageUploader({ buffer: compressedBuffer }, slugFileName);
             processedImages.push(uploadResult);
         }
 
-        return res.status(200).json({
+        res.status(200).json({
             success: true,
             message: "Images uploaded successfully",
             data: processedImages,
         });
 
     } catch (err) {
-        return res.status(500).json({
+        res.status(500).json({
             success: false,
             message: "Server error",
             error: err.message,
         });
     }
 });
-
-
 
 router.post("/bookVideoCall", async (req, res) => {
     const { email, body } = req.body;
