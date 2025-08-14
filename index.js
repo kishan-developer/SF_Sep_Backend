@@ -44,7 +44,7 @@ app.use(
 
 
 // CORS settings
-const allowedOrigins = ["http://localhost:5173"];
+const allowedOrigins = ["https://srijanfabs.com"];
 
 app.use(
   cors({
