@@ -47,6 +47,69 @@ router.get("/offer", getOffer);
 router.get("/offer/:productId", getOfferOfProduct);
 
 
+
+
+
+
+// max - 8mb 
+// const imageUploader = require("../utils/imageUploader"); // adjust path if needed
+
+router.post("/upload", async (req, res) => {
+  try {
+    const images = req.files?.files ?? null;
+    const imageFileName = req.body.name;
+
+    if (!images) {
+      return res.status(400).json({ success: false, message: "Please upload file first" });
+    }
+
+    const imageList = Array.isArray(images) ? images : [images];
+    const slugFileName = imageFileName.trim().replace(/\s+/g, "-");
+
+    const processedImages = [];
+
+    for (const image of imageList) {
+      if (!image.size || image.size === 0) {
+        return res.status(400).json({ success: false, message: "Uploaded image is empty" });
+      }
+
+      // Limit to 8MB
+    //   if (image.size > 8 * 1024 * 1024) {
+    //     return res.status(400).json({
+    //       success: false,
+    //       message: "Image size should not exceed 8MB",
+    //     });
+    //   }
+
+      // Compress and resize using Sharp
+      const compressedBuffer = await sharp(image.data)
+        .resize({ width: 1400 }) // Max width 1200px
+        .jpeg({ quality: 90 })   // Compress to 80% quality
+        .toBuffer();
+
+      // Upload compressed buffer to Cloudinary
+      const uploadResult = await imageUploader({ buffer: compressedBuffer }, slugFileName);
+      processedImages.push(uploadResult);
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Images uploaded successfully",
+      data: processedImages,
+    });
+
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: "Server error",
+      error: err.message,
+    });
+  }
+});
+
+
+
+
 // router.post("/uploads", async (req, res) => {
 
 //     // console.log("/upload Route")
@@ -136,50 +199,50 @@ router.get("/offer/:productId", getOfferOfProduct);
 // });
 
 
-router.post("/upload", async (req, res) => {
-    try {
-        const images = req.files?.files ?? null;
-        const imageFileName = req.body.name;
+// router.post("/upload", async (req, res) => {
+//     try {
+//         const images = req.files?.files ?? null;
+//         const imageFileName = req.body.name;
 
-        if (!images) {
-            return res.status(400).json({ success: false, message: "Please upload file first" });
-        }
+//         if (!images) {
+//             return res.status(400).json({ success: false, message: "Please upload file first" });
+//         }
 
-        const imageList = Array.isArray(images) ? images : [images];
-        const slugFileName = imageFileName.trim().replace(/\s+/g, "-");
+//         const imageList = Array.isArray(images) ? images : [images];
+//         const slugFileName = imageFileName.trim().replace(/\s+/g, "-");
 
-        const processedImages = [];
+//         const processedImages = [];
 
-        for (const image of imageList) {
-            if (!image.data || image.data.length === 0) {
-                return res.status(400).json({ success: false, message: "Uploaded image is empty" });
-            }
+//         for (const image of imageList) {
+//             if (!image.data || image.data.length === 0) {
+//                 return res.status(400).json({ success: false, message: "Uploaded image is empty" });
+//             }
 
-            // Process with Sharp (compress + resize)
-            const compressedBuffer = await sharp(image.data)
-                .resize({ width: 1200 })
-                .jpeg({ quality: 80 })
-                .toBuffer();
+//             // Process with Sharp (compress + resize)
+//             const compressedBuffer = await sharp(image.data)
+//                 .resize({ width: 1200 })
+//                 .jpeg({ quality: 80 })
+//                 .toBuffer();
 
-            // Pass buffer directly to Cloudinary
-            const uploadResult = await imageUploader({ buffer: compressedBuffer }, slugFileName);
-            processedImages.push(uploadResult);
-        }
+//             // Pass buffer directly to Cloudinary
+//             const uploadResult = await imageUploader({ buffer: compressedBuffer }, slugFileName);
+//             processedImages.push(uploadResult);
+//         }
 
-        res.status(200).json({
-            success: true,
-            message: "Images uploaded successfully",
-            data: processedImages,
-        });
+//         res.status(200).json({
+//             success: true,
+//             message: "Images uploaded successfully",
+//             data: processedImages,
+//         });
 
-    } catch (err) {
-        res.status(500).json({
-            success: false,
-            message: "Server error",
-            error: err.message,
-        });
-    }
-});
+//     } catch (err) {
+//         res.status(500).json({
+//             success: false,
+//             message: "Server error",
+//             error: err.message,
+//         });
+//     }
+// });
 
 router.post("/bookVideoCall", async (req, res) => {
     const { email, body } = req.body;
