@@ -65,6 +65,70 @@ module.exports = imageUploader;
 
 
 
+// const { cloudinary }  = require("../config/cloudinary.js");
+
+// const imageUploader = async (file, imageFileName) => {
+//   const uploadBufferToCloudinary = (buffer) => {
+//     return new Promise((resolve, reject) => {
+//       const stream = cloudinary.uploader.upload_stream(
+//         {
+//           folder: "products",
+//           public_id: `${imageFileName}-${Date.now()}`,
+//           resource_type: "image",
+//         },
+//         (err, result) => {
+//           if (err) return reject(err);
+//           resolve(result.secure_url);
+//         }
+//       );
+//       stream.end(buffer);
+//     });
+//   };
+
+//   const uploadFromTempFile = (fileObj) => {
+//     return new Promise((resolve, reject) => {
+//       cloudinary.uploader.upload(
+//         fileObj.tempFilePath,
+//         {
+//           folder: "products",
+//           public_id: `${imageFileName}-${Date.now()}`,
+//           resource_type: "image",
+//         },
+//         (err, result) => {
+//           if (err) return reject(err);
+//           resolve(result.secure_url);
+//         }
+//       );
+//     });
+//   };
+
+//   // If file is an array (multiple uploads)
+//   if (Array.isArray(file)) {
+//     const uploaded = [];
+//     for (const f of file) {
+//       if (f.buffer) {
+//         uploaded.push(await uploadBufferToCloudinary(f.buffer));
+//       } else if (f.tempFilePath) {
+//         uploaded.push(await uploadFromTempFile(f));
+//       }
+//     }
+//     return uploaded;
+//   }
+
+//   // Single file
+//   if (file.buffer) {
+//     return await uploadBufferToCloudinary(file.buffer);
+//   } else if (file.tempFilePath) {
+//     return await uploadFromTempFile(file);
+//   }
+
+//   throw new Error("Unsupported file format: no buffer or tempFilePath found.");
+// };
+
+// module.exports = imageUploader;
+
+
+
 
 // const { cloudinary }  = require("../config/cloudinary.js");
 
