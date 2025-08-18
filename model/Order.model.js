@@ -100,6 +100,15 @@ const orderSchema = new mongoose.Schema(
         delhiveryReceipt: {
             type: String,
         },
+        trackingId: {
+            type: String,
+        },
+        parcelWeight: {
+            type: Number,
+        },
+        deliveryPartner: {
+            type: String,
+        }, 
         user: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
