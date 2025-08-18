@@ -1,4 +1,5 @@
 const express = require("express");
+const User = require("../../model/User.model");
 const { isAuthenticated } = require("../../middleware/auth.middleware");
 const cartRouter = require("./cart.routes");
 const wishlistRouter = require("./wishlist.routes");
