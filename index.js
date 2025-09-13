@@ -12,12 +12,14 @@ const sendCustomResponse = require("./middleware/customResponse.middleware");
 const connectDB = require("./config/connectDb");
 const { globalErrorHandler } = require("./middleware/globalErrorHandler.middleware");
 const router = require("./routes/index.routes");
-const {connectCloudinary} = require("./config/cloudinary");
+const { connectCloudinary } = require("./config/cloudinary");
 
 
 
 const NodeCache = require("node-cache");
-const productCache = new NodeCache({ stdTTL: 86400, checkperiod: 900 }); 
+
+
+const productCache = new NodeCache({ stdTTL: 86400, checkperiod: 900 });
 
 dotenv.config();
 
@@ -44,7 +46,7 @@ app.use(
 
 
 // CORS settings
-const allowedOrigins = ["https://srijanfabs.com"];
+const allowedOrigins = ["https://srijanfabs.com", "http://localhost:5173"];
 
 app.use(
   cors({
@@ -67,7 +69,7 @@ app.use(helmet());
 // File upload
 app.use(
   fileUpload({
-    useTempFiles: false,   
+    useTempFiles: false,
     tempFileDir: "/tmp",
   })
 );
@@ -78,6 +80,19 @@ app.use(sendCustomResponse);
 // API routes
 app.use("/api/v1", router);
 
+//   try {
+//     // Fetch all product IDs (as ObjectIds)
+//     const ids = await ProductModel.distinct("_id");
+
+//     // Convert ObjectIds to strings
+//     const idStrings = ids.map(id => id.toString());
+
+//     res.json(idStrings);
+//   } catch (err) {
+//     console.error("Error fetching product IDs:", err);
+//     res.status(500).json({ error: "Internal Server Error" });
+//   }
+// })
 // Default route
 app.get("/", (req, res) => {
   res.send("Welcome to the API root SRIJNFBS..../1");

@@ -27,6 +27,8 @@ const {
     getOffer,
     getOfferOfProduct,
 } = require("../controller/public/product/offer.controller");
+const { blogRouter } = require("./blog.routes");
+const { commentRouter } = require("./comment.routes");
 
 
 const router = express.Router();
@@ -35,6 +37,10 @@ router.use("/auth", authRoutes);
 router.use("/admin", adminRoutes);
 router.use("/user", userRoutes);
 router.use("/payment", paymentRoutes);
+// Blog Apis 
+router.use('/blogs', blogRouter)
+// ------------------------------------Comments Api-------------------------------------
+router.use('comments', commentRouter)
 // Public routes
 // Products
 router.get("/products", getAllProducts);
@@ -51,60 +57,61 @@ router.get("/offer/:productId", getOfferOfProduct);
 
 
 
+
 // max - 8mb 
 // const imageUploader = require("../utils/imageUploader"); // adjust path if needed
 
 router.post("/upload", async (req, res) => {
-  try {
-    const images = req.files?.files ?? null;
-    const imageFileName = req.body.name;
+    try {
+        const images = req.files?.files ?? null;
+        const imageFileName = req.body.name;
 
-    if (!images) {
-      return res.status(400).json({ success: false, message: "Please upload file first" });
+        if (!images) {
+            return res.status(400).json({ success: false, message: "Please upload file first" });
+        }
+
+        const imageList = Array.isArray(images) ? images : [images];
+        const slugFileName = imageFileName.trim().replace(/\s+/g, "-");
+
+        const processedImages = [];
+
+        for (const image of imageList) {
+            if (!image.size || image.size === 0) {
+                return res.status(400).json({ success: false, message: "Uploaded image is empty" });
+            }
+
+            // Limit to 8MB
+            //   if (image.size > 8 * 1024 * 1024) {
+            //     return res.status(400).json({
+            //       success: false,
+            //       message: "Image size should not exceed 8MB",
+            //     });
+            //   }
+
+            // Compress and resize using Sharp
+            const compressedBuffer = await sharp(image.data)
+                .resize({ width: 1400 }) // Max width 1200px
+                .jpeg({ quality: 90 })   // Compress to 80% quality
+                .toBuffer();
+
+            // Upload compressed buffer to Cloudinary
+            const uploadResult = await imageUploader({ buffer: compressedBuffer }, slugFileName);
+            processedImages.push(uploadResult);
+        }
+
+        res.status(200).json({
+            success: true,
+            message: "Images uploaded successfully",
+            data: processedImages,
+        });
+
+    } catch (err) {
+        res.status(500).json({
+            success: false,
+            message: "Server error",
+            error: err.message,
+        });
     }
-
-    const imageList = Array.isArray(images) ? images : [images];
-    const slugFileName = imageFileName.trim().replace(/\s+/g, "-");
-
-    const processedImages = [];
-
-    for (const image of imageList) {
-      if (!image.size || image.size === 0) {
-        return res.status(400).json({ success: false, message: "Uploaded image is empty" });
-      }
-
-      // Limit to 8MB
-    //   if (image.size > 8 * 1024 * 1024) {
-    //     return res.status(400).json({
-    //       success: false,
-    //       message: "Image size should not exceed 8MB",
-    //     });
-    //   }
-
-      // Compress and resize using Sharp
-      const compressedBuffer = await sharp(image.data)
-        .resize({ width: 1400 }) // Max width 1200px
-        .jpeg({ quality: 90 })   // Compress to 80% quality
-        .toBuffer();
-
-      // Upload compressed buffer to Cloudinary
-      const uploadResult = await imageUploader({ buffer: compressedBuffer }, slugFileName);
-      processedImages.push(uploadResult);
-    }
-
-    res.status(200).json({
-      success: true,
-      message: "Images uploaded successfully",
-      data: processedImages,
-    });
-
-  } catch (err) {
-    res.status(500).json({
-      success: false,
-      message: "Server error",
-      error: err.message,
-    });
-  }
 });
 
 
