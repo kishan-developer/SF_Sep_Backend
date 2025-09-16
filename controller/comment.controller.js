@@ -106,7 +106,7 @@ export const getCommentsByBlog = async (req, res) => {
 
         // Step 2: Fetch only approved comments for this blog
         const comments = await CommentModel.find({ blog: blogId, status: "approved" })
-            .populate("author", "name") // Get author's name
+            .populate("author", "firstName lastName") // Get author's name
             .sort({ createdAt: -1 })   // Latest first
             .lean();                    // Plain JS object
 
@@ -209,21 +209,24 @@ export const adminDeleteComment = async (req, res) => {
 };
 
 // -----------------------
-// GET ALL PENDING COMMENTS (Admin)
+// GET ALL  COMMENTS (Admin)
 // -----------------------
-export const getPendingComments = async (req, res) => {
+// GET /api/v1/comments/admin/all
+export const getAllCommentsForAdmin = async (req, res) => {
     try {
-        // Step 1: Fetch comments with status 'pending'
-        const comments = await CommentModel.find({ status: "pending" })
-            .populate("author", "name") // Include author's name
-            .sort({ createdAt: -1 })   // Latest first
+        const comments = await CommentModel.find()
+            .populate("author", "firstName lastName")
+            .sort({ createdAt: -1 })
             .lean();
 
-        // Step 2: Return pending comments
-        return res.success("Pending comments fetched", comments);
+        // Split comments by status
+        const pending = comments.filter(c => c.status === "pending");
+        const approved = comments.filter(c => c.status === "approved");
 
+        return res.success("All comments fetched", { pending, approved });
     } catch (error) {
         console.error(error);
-        return res.error("Failed to fetch pending comments", 500);
+        return res.error("Failed to fetch comments", 500);
     }
 };
+

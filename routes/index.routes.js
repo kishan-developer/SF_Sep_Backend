@@ -40,7 +40,7 @@ router.use("/payment", paymentRoutes);
 // Blog Apis 
 router.use('/blogs', blogRouter)
 // ------------------------------------Comments Api-------------------------------------
-router.use('comments', commentRouter)
+router.use('/comments', commentRouter)
 // Public routes
 // Products
 router.get("/products", getAllProducts);

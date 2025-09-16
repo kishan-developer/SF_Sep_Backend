@@ -22,6 +22,8 @@ const blogSchema = new mongoose.Schema({
 
 
     status: { type: Boolean, default: false },
+}, {
+    timestamps: true
 })
 
 blogSchema.pre('validate', function (next) {

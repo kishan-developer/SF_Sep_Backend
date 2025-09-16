@@ -2,6 +2,7 @@ import BlogModel from "../model/Blog.model.js";
 import imageUploader from "../utils/imageUpload.utils.js";
 import sanitizeHtml from "sanitize-html";
 import NodeCache from "node-cache";
+import CommentModel from "../model/Comment.model.js";
 const cache = new NodeCache({ stdTTL: 300, checkperiod: 320 }); // 5 min TTL
 
 export const createBlog = async (req, res) => {
@@ -73,6 +74,7 @@ export const updateBlog = async (req, res) => {
 };
 
 
+
 export const deleteBlog = async (req, res) => {
     try {
         // Step 1 -> Get blog ID from params
@@ -84,12 +86,17 @@ export const deleteBlog = async (req, res) => {
             return res.error("Blog not found", 404);
         }
 
-        // Step 3 -> Delete the blog
+        // Step 3 -> Delete all comments linked to this blog
+        await CommentModel.deleteMany({ blog: id });
+
+        // Step 4 -> Delete the blog
         await blog.deleteOne();
-        // Invalidate cache
-        cache.flushAll()
-        // Step 4 -> Return success response
-        return res.success("Blog deleted successfully");
+
+        // Step 5 -> Invalidate cache (if using caching for blogs or comments)
+        cache.flushAll();
+
+        // Step 6 -> Return success response
+        return res.success("Blog and its comments deleted successfully");
     } catch (error) {
         console.error(error);
         return res.error("Something went wrong while deleting the blog", 500);
@@ -105,7 +112,7 @@ export const getBlogsAdmin = async (req, res) => {
         if (cached) return res.success("Blogs fetched (cache)", cached);
 
         const blogs = await BlogModel.find()
-            .select("title slug coverImage tags createdAt")
+            .select("title slug coverImage tags createdAt content")
             .sort({ createdAt: -1 })
             .lean();
 

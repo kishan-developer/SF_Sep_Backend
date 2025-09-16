@@ -7,7 +7,8 @@ import {
     moderateComment,
     adminReply,
     adminDeleteComment,
-    getPendingComments,
+
+    getAllCommentsForAdmin,
 } from "../controller/comment.controller.js";
 import { isAuthenticated, isAdmin } from "../middleware/auth.middleware.js";
 
@@ -34,13 +35,14 @@ commentRouter.delete("/:id", isAuthenticated, deleteComment);
 commentRouter.get("/blog/:blogId", getCommentsByBlog);
 
 
+
 // ====================
 // ADMIN ROUTES
 // ====================
 
 // GET http://localhost:5000/api/v1/comments/pending/all
-// Get all pending comments (Admin)
-commentRouter.get("/pending/all", isAuthenticated, isAdmin, getPendingComments);
+// Get all pending and approved  comments (Admin)
+commentRouter.get("/all", isAuthenticated, isAdmin, getAllCommentsForAdmin);
 
 // PUT http://localhost:5000/api/v1/comments/moderate/:id
 // Approve or reject a comment (Admin)
