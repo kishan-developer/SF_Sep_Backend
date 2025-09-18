@@ -65,29 +65,7 @@ const getOrderById = async (req, res) => {
 };
 
 
-// const updateDelhiveryReceipt = async (req, res) => {
-//     const {
-//         delhiveryReceipt,
-//         orderId,
-//         trackingId,
-//         parcelWeight,
-//         deliveryPartner,
-//     } = req.body;
-//     if (!delhiveryReceipt || !trackingId || !parcelWeight || !deliveryPartner) {
-//         return res.error("Please provide all data", 400);
-//     }
-//     const order = await Order.findById(orderId);
-//     if (!order) {
-//         return res.error("Order dose not exit");
-//     }
 
-//     order.delhiveryReceipt = delhiveryReceipt;
-//     order.trackingId = trackingId;
-//     order.parcelWeight = parcelWeight;
-//     order.deliveryPartner = deliveryPartner;
-//     order.save();
-//     return res.success("Delhivery Receipt Uploaded Successfully");
-// };
 
 
 
@@ -95,22 +73,14 @@ const getOrderById = async (req, res) => {
 const updateDelhiveryReceipt = async (req, res) => {
     try {
         const {
-            delhiveryReceipt, // File path or URL
+            delhiveryReceipt, // URL
             orderId,
             trackingId,
             parcelWeight,
             deliveryPartner,
         } = req.body;
 
-        // console.log("Received data:", {
-        //     delhiveryReceipt,
-        //     orderId,
-        //     trackingId,
-        //     parcelWeight,
-        //     deliveryPartner,
-        // });
 
-        // Validate required fields
         if (!orderId || !delhiveryReceipt || !trackingId || !parcelWeight || !deliveryPartner) {
             return res.status(400).json({
                 success: false,

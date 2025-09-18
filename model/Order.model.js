@@ -104,11 +104,11 @@ const orderSchema = new mongoose.Schema(
             type: String,
         },
         parcelWeight: {
-            type: Number,
+            type: String,
         },
         deliveryPartner: {
             type: String,
-        }, 
+        },
         user: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
@@ -141,9 +141,7 @@ const orderSchema = new mongoose.Schema(
         discount: {
             type: Number,
         },
-        // offer: {
-        //     type: Number,
-        // },
+
         shippingAddressSnapshot: {
             street: String,
             city: String,
@@ -186,4 +184,4 @@ const orderSchema = new mongoose.Schema(
     { timestamps: true }
 );
 
-module.exports = mongoose.model("Order", orderSchema);
+module.exports = mongoose.model("Order", orderSchema);
