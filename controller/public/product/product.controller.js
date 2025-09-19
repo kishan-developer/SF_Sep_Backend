@@ -1,59 +1,10 @@
 const Product = require("../../../model/Product.model");
 const { client } = require('../../../utils/redisClient');
 const NodeCache = require("node-cache");
-const productCache = new NodeCache({ stdTTL: 86400, checkperiod: 900 }); 
- // TTL (Time to Live) =  1 day = 24 hours = 24 × 60 × 60 = 86400 seconds
+const productCache = new NodeCache({ stdTTL: 86400, checkperiod: 900 });
+// TTL (Time to Live) =  1 day = 24 hours = 24 × 60 × 60 = 86400 seconds
 
 const asyncHandler = require("express-async-handler");
-
-
-// const getAllProducts = asyncHandler(async (req, res) => {
-//     const products = await Product.find({})
-//         .populate("category")
-//         .populate("fabric")
-//         .populate({
-//             path: "reviews",
-//             populate: {
-//                 path: "user",
-//                 model: "User",
-//             },
-//         })
-//         .exec();
-//     return res.success("Products Fetched Successfully.", products);
-// });
-
-
-
-// const getAllProducts = asyncHandler(async (req, res) => {
-//     const cacheKey = "allProducts";
-
-//     // 1️ Check if data exists in cache
-//     const cachedProducts = productCache.get(cacheKey);
-//     if (cachedProducts) {
-//         return res.success("Products fetched from cache.", cachedProducts);
-//     }
-
-//     // 2️ If not cached, fetch from DB
-//     const products = await Product.find({})
-//         .populate("category")
-//         .populate("fabric")
-//         .populate({
-//             path: "reviews",
-//             populate: {
-//                 path: "user",
-//                 model: "User",
-//             },
-//         })
-//         .exec();
-
-//     // 3 Store in cache
-//     productCache.set(cacheKey, products);
-
-//     return res.success("Products fetched successfully.", products);
-// });
-
-
-
 const getAllProducts = asyncHandler(async (req, res) => {
     const cacheKey = "allProducts";
 
@@ -80,7 +31,7 @@ const getAllProducts = asyncHandler(async (req, res) => {
     // 3 Store in cache
     productCache.set(cacheKey, products);
 
-    return res.success("Products fetched successfully.", products);
+    return res.success("Products fetched successfully From Sever. ", products);
 });
 
 
@@ -89,9 +40,14 @@ const getAllProducts = asyncHandler(async (req, res) => {
 
 const getProductById = asyncHandler(async (req, res) => {
     const _id = req.body?.id || req.params.id;
+    const cacheKey = `product${_id}`
 
     if (!_id) {
         return res.error("Products Id Are Required", 400);
+    }
+    const cachedProducts = productCache.get(cacheKey);
+    if (cachedProducts) {
+        return res.success("Products fetched from cache.", cachedProducts);
     }
 
     const product = await Product.findById(_id)
@@ -110,6 +66,8 @@ const getProductById = asyncHandler(async (req, res) => {
     if (!product) {
         return res.error("Product Not Found", 404);
     }
+    // Set Cache for Product
+    productCache.set(cacheKey, product)
     return res.success("Product Fetched Successfully", product);
 });
 

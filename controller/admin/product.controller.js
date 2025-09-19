@@ -4,7 +4,8 @@ const Product = require("../../model/Product.model");
 const Category = require("../../model/Category.model");
 const sanitizePayload = require("../../utils/sanitizePayload");
 const { PRODUCT_ALLOWED_FIELDS } = require("../../constants/constants");
-
+const NodeCache = require("node-cache");
+const myCache = new NodeCache();
 const createProduct = asyncHandler(async (req, res) => {
     const {
         name,
@@ -21,7 +22,7 @@ const createProduct = asyncHandler(async (req, res) => {
         reviews = [],
         images = [],
     } = req.body;
-
+    const cacheKey = "allProducts";
     // Validate required fields
     if (
         !name ||
@@ -88,10 +89,12 @@ const createProduct = asyncHandler(async (req, res) => {
         })
         .exec();
 
+    myCache.del(cacheKey);
     return res.success("Product created successfully.", allProducts);
 });
 
 const updateProduct = asyncHandler(async (req, res) => {
+    const cacheKey = `product${_id}`
     const _id = req.params?.id || req.body?.id;
     const payload = req.body;
 
@@ -146,11 +149,13 @@ const updateProduct = asyncHandler(async (req, res) => {
             },
         })
         .exec();
+    myCache.del(cacheKey)
     return res.success("Product category updated successfully", allProducts);
 });
 
 const deleteProduct = asyncHandler(async (req, res) => {
     const _id = req.body?.id || req.params.id;
+    const cacheKey = "allProducts";
     if (!_id) {
         return res.error("Product ID is required", 400);
     }
@@ -187,6 +192,7 @@ const deleteProduct = asyncHandler(async (req, res) => {
             },
         })
         .exec();
+    myCache.del(cacheKey)
     return res.success("Product deleted successfully", allProducts);
 });
 
