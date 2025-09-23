@@ -23,4 +23,4 @@ blogRouter.get('/', isAuthenticated, isAdmin, getBlogsAdmin);
 blogRouter.get('/all', getBlogs);
 blogRouter.get('/:id', getBlogById);
 
-module.exports = blogRouter;
+module.exports = { blogRouter };
