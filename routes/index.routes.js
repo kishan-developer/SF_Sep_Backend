@@ -332,6 +332,8 @@ router.post("/newsletter", async (req, res) => {
     }
 });
 
+
+
 // POST /api/contact
 router.post("/contact", async (req, res) => {
     const { name, email, phone, subject, message } = req.body;

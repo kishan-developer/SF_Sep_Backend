@@ -1,4 +1,6 @@
 const express = require("express");
+// Newsletter Mode 
+const NewsletterModel = require('../../model/Newsletter.model')
 const adminRouter = express.Router();
 const productRoutes = require("../../routes/admin/product.routes");
 const categoryRoutes = require("../../routes/admin/category.routes");
@@ -25,13 +27,14 @@ adminRouter.use("/orders", orderRouter);
 adminRouter.use("/coupon", couponRouter);
 adminRouter.use("/offer", adminOfferRouter);
 adminRouter.get("/overview", getOverview);
-adminRouter.get('/newsletters',async(req,res)=>{
+adminRouter.get('/newsletters', async (req, res) => {
     try {
         const emails = await NewsletterModel.find({});
         return res.status(200).json(emails)
     } catch (error) {
-       return  res.status(500).json({
-            message:"Error wile fetching  emails"
+        console.log('Error WHile Fetching Emails ->', emails)
+        return res.status(500).json({
+            message: "Error wile fetching  emails"
         })
     }
 })

@@ -1,5 +1,6 @@
-import mongoose, { model, Schema } from "mongoose";
-import slugify from 'slugify'
+const mongoose = require("mongoose");
+const { model, Schema } = mongoose;
+const slugify = require('slugify');
 const blogSchema = new mongoose.Schema({
     title: {
         type: String,
@@ -38,6 +39,6 @@ blogSchema.pre('validate', function (next) {
 
 
 
-
-export default mongoose.model("Blog", blogSchema);
+const Blog = mongoose.model("Blog", blogSchema);
+module.exports = Blog
 
