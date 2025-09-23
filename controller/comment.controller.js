@@ -1,4 +1,4 @@
-import CommentModel from "../model/Comment.model.js";
+const CommentModel = require("../model/Comment.model.js");
 
 // ====================
 // USER CONTROLLERS
@@ -7,7 +7,7 @@ import CommentModel from "../model/Comment.model.js";
 // -----------------------
 // CREATE COMMENT (User)
 // -----------------------
-export const createComment = async (req, res) => {
+const createComment = async (req, res) => {
     try {
         // Step 1: Extract blogId and comment from request body
         const { blogId, comment } = req.body;
@@ -37,7 +37,7 @@ export const createComment = async (req, res) => {
 // -----------------------
 // UPDATE COMMENT (User)
 // -----------------------
-export const updateComment = async (req, res) => {
+const updateComment = async (req, res) => {
     try {
         // Step 1: Get comment ID from params and new text from body
         const { id } = req.params;
@@ -70,7 +70,7 @@ export const updateComment = async (req, res) => {
 // -----------------------
 // DELETE COMMENT (User)
 // -----------------------
-export const deleteComment = async (req, res) => {
+const deleteComment = async (req, res) => {
     try {
         // Step 1: Get comment ID from params
         const { id } = req.params;
@@ -99,7 +99,7 @@ export const deleteComment = async (req, res) => {
 // -----------------------
 // GET APPROVED COMMENTS FOR BLOG (User)
 // -----------------------
-export const getCommentsByBlog = async (req, res) => {
+const getCommentsByBlog = async (req, res) => {
     try {
         // Step 1: Get blog ID from params
         const { blogId } = req.params;
@@ -126,7 +126,7 @@ export const getCommentsByBlog = async (req, res) => {
 // -----------------------
 // APPROVE OR REJECT COMMENT
 // -----------------------
-export const moderateComment = async (req, res) => {
+const moderateComment = async (req, res) => {
     try {
         // Step 1: Get comment ID and action from request
         const { id } = req.params;
@@ -159,7 +159,7 @@ export const moderateComment = async (req, res) => {
 // -----------------------
 // ADMIN REPLY TO COMMENT
 // -----------------------
-export const adminReply = async (req, res) => {
+const adminReply = async (req, res) => {
     try {
         // Step 1: Get comment ID and reply text
         const { id } = req.params;
@@ -189,7 +189,7 @@ export const adminReply = async (req, res) => {
 // -----------------------
 // DELETE COMMENT (Admin)
 // -----------------------
-export const adminDeleteComment = async (req, res) => {
+const adminDeleteComment = async (req, res) => {
     try {
         // Step 1: Get comment ID
         const { id } = req.params;
@@ -212,7 +212,7 @@ export const adminDeleteComment = async (req, res) => {
 // GET ALL  COMMENTS (Admin)
 // -----------------------
 // GET /api/v1/comments/admin/all
-export const getAllCommentsForAdmin = async (req, res) => {
+const getAllCommentsForAdmin = async (req, res) => {
     try {
         const comments = await CommentModel.find()
             .populate("author", "firstName lastName")
@@ -229,4 +229,16 @@ export const getAllCommentsForAdmin = async (req, res) => {
         return res.error("Failed to fetch comments", 500);
     }
 };
+
+
+module.exports = {
+    createComment,
+    updateComment,
+    deleteComment,
+    getCommentsByBlog,
+    moderateComment,
+    adminReply,
+    adminDeleteComment,
+    getAllCommentsForAdmin
+}
 

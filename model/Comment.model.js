@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+const mongoose = require("mongoose");
 
 const commentSchema = new mongoose.Schema({
     blog: { type: mongoose.Schema.Types.ObjectId, ref: "Blog", required: true },
@@ -12,4 +12,7 @@ const commentSchema = new mongoose.Schema({
 // Optional index for faster queries
 commentSchema.index({ blog: 1, status: 1 });
 
-export default mongoose.model("Comment", commentSchema);
+const Comment = mongoose.model("Comment", commentSchema);
+
+
+module.export = Comment;

@@ -1,11 +1,11 @@
-import BlogModel from "../model/Blog.model.js";
-import imageUploader from "../utils/imageUpload.utils.js";
-import sanitizeHtml from "sanitize-html";
-import NodeCache from "node-cache";
-import CommentModel from "../model/Comment.model.js";
+const BlogModel = require('../model/Blog.model.js');
+const imageUploader = require('../utils/imageUpload.utils.js')
+const sanitizeHtml = require("sanitize-html");
+const NodeCache = require("node-cache");
+const CommentModel = require("../model/Comment.model")
 const cache = new NodeCache({ stdTTL: 300, checkperiod: 320 }); // 5 min TTL
 
-export const createBlog = async (req, res) => {
+const createBlog = async (req, res) => {
     try {
         // Step 1 -> Get Required Data From Req.body; 
         const { title, content, coverImage, status, slug } = req.body;
@@ -32,7 +32,7 @@ export const createBlog = async (req, res) => {
     }
 }
 
-export const updateBlog = async (req, res) => {
+const updateBlog = async (req, res) => {
     try {
         // Step 1 -> Get blog ID from params
         const { id } = req.params;
@@ -75,7 +75,7 @@ export const updateBlog = async (req, res) => {
 
 
 
-export const deleteBlog = async (req, res) => {
+const deleteBlog = async (req, res) => {
     try {
         // Step 1 -> Get blog ID from params
         const { id } = req.params;
@@ -105,7 +105,7 @@ export const deleteBlog = async (req, res) => {
 
 // Get Blogs 
 
-export const getBlogsAdmin = async (req, res) => {
+const getBlogsAdmin = async (req, res) => {
     try {
         const cacheKey = "allBlogsAdmin";
         const cached = cache.get(cacheKey);
@@ -124,7 +124,7 @@ export const getBlogsAdmin = async (req, res) => {
     }
 };
 
-export const getBlogs = async (req, res) => {
+const getBlogs = async (req, res) => {
     try {
         const cacheKey = "allBlogs";
         const cached = cache.get(cacheKey);
@@ -145,7 +145,7 @@ export const getBlogs = async (req, res) => {
 
 
 //  GET Blog by ID
-export const getBlogById = async (req, res) => {
+const getBlogById = async (req, res) => {
     try {
         const { id } = req.params;
 
@@ -171,5 +171,14 @@ export const getBlogById = async (req, res) => {
         return res.error("Something went wrong while fetching the blog", 500);
     }
 };
+
+module.exports = {
+    createBlog,
+    updateBlog,
+    deleteBlog,
+    getBlogsAdmin,
+    getBlogs,
+    getBlogById
+}
 
 

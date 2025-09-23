@@ -5,7 +5,7 @@ require("dotenv").config();
 
 // Middleware for Check is user authenticated or not ?
 exports.isAuthenticated = asyncHandler(async (req, res, next) => {
-    const token =  
+    const token =
         req.cookies?.token ||
         req.body?.token ||
         req.header("Authorization")?.replace("Bearer ", "");
@@ -26,7 +26,7 @@ exports.isAuthenticated = asyncHandler(async (req, res, next) => {
         req.user = user;
         next();
     } catch (error) {
-        console.log('Error From Auth MiddleWare.',error.message);
+        console.log('Error From Auth MiddleWare.', error.message);
         return res.error("Something Went Wrong !", 401);
     }
 
@@ -35,7 +35,7 @@ exports.isAuthenticated = asyncHandler(async (req, res, next) => {
 // Middleware for check is user is admin Or someone else if admin then go to next controller
 exports.isAdmin = asyncHandler(async (req, res, next) => {
     const user = req?.user ?? null;
-    console.log("User Data ->", user);
+
     // Step 1: Check if token attached user info
     if (!user) {
         return res.error("Unauthorized access. User not authenticated.", 401);

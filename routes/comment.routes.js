@@ -1,5 +1,5 @@
-import express from "express";
-import {
+const express = require("express");
+const {
     createComment,
     updateComment,
     deleteComment,
@@ -9,10 +9,10 @@ import {
     adminDeleteComment,
 
     getAllCommentsForAdmin,
-} from "../controller/comment.controller.js";
-import { isAuthenticated, isAdmin } from "../middleware/auth.middleware.js";
+} = require("../controller/comment.controller.js");
+const { isAuthenticated, isAdmin } = require("../middleware/auth.middleware.js");
 
-export const commentRouter = express.Router();
+const commentRouter = express.Router();
 
 // ====================
 // USER ROUTES
@@ -59,3 +59,6 @@ commentRouter.put("/reply/:id", isAuthenticated, isAdmin, adminReply);
 commentRouter.delete("/admin/:id", isAuthenticated, isAdmin, adminDeleteComment);
 
 
+module.exports = {
+    commentRouter
+}
