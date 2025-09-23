@@ -5,8 +5,8 @@ const authRoutes = require("../routes/auth.routes");
 const adminRoutes = require("../routes/admin/index.routes");
 const userRoutes = require("./user/index.routes");
 const paymentRoutes = require("./payment.routes");
-const blogRouter = require("./blog.routes"); // fixed import
-const commentRouter = require("./comment.routes"); // fixed import
+const { blogRouter } = require("./blog.routes"); // fixed import
+const  { commentRouter } = require("./comment.routes"); // fixed import
 
 const {
   getAllProducts,
