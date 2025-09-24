@@ -15,4 +15,4 @@ commentSchema.index({ blog: 1, status: 1 });
 const Comment = mongoose.model("Comment", commentSchema);
 
 
-module.export = Comment;
+module.exports = Comment;

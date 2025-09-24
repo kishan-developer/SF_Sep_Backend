@@ -1,4 +1,4 @@
-const CommentModel = require("../model/Comment.model.js");
+const CommentModel = require('../model/Comment.model');
 
 // ====================
 // USER CONTROLLERS
